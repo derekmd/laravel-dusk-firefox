@@ -1,0 +1,8 @@
+bin/geckodriver*
+storage
+vendor
+.php_cs.cache
+composer.lock
+coverage
+.phpunit.result.cache
+phpunit.xml
