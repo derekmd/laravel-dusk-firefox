@@ -1,0 +1,58 @@
+{
+    "name": "derekmd/laravel-dusk-firefox",
+    "description": "Run Laravel Dusk tests in a Firefox browser",
+    "keywords": [
+        "dusk",
+        "firefox",
+        "geckodriver",
+        "laravel"
+    ],
+    "homepage": "https://github.com/derekmd/laravel-dusk-firefox",
+    "license": "MIT",
+    "support": {
+        "issues": "https://github.com/derekmd/laravel-dusk-firefox/issues",
+        "source": "https://github.com/spatie/laravel-query-builder"
+    },
+    "authors": [
+        {
+            "name": "Derek MacDonald",
+            "email": "derekmd@hotmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.2.5",
+        "guzzlehttp/guzzle": "^6.0|^7.0",
+        "laravel/dusk": "^6.0"
+    },
+    "require-dev": {
+        "mockery/mockery": "^1.4.0",
+        "phpunit/phpunit": "^9.0",
+        "orchestra/testbench": "^4.0|^5.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Derekmd\\Dusk\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Derekmd\\Dusk\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "download": "vendor/bin/phpunit tests/DownloadBinaries.php",
+        "test": "vendor/bin/phpunit"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Derekmd\\Dusk\\DuskServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
