@@ -18,6 +18,7 @@ class DuskServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->commands([
+                Console\ChromeCommand::class,
                 Console\FirefoxDriverCommand::class,
                 Console\InstallCommand::class,
             ]);
