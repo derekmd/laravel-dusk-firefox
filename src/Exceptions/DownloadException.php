@@ -9,8 +9,8 @@ class DownloadException extends Exception
     /**
      * Create a download exception instance.
      *
-     * @param string  $url
-     * @param \Exception|null $previous
+     * @param  string  $url
+     * @param  \Exception|null  $previous
      */
     public function __construct($url, Exception $previous = null)
     {

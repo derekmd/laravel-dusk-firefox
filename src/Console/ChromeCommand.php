@@ -2,6 +2,7 @@
 
 namespace Derekmd\Dusk\Console;
 
+use Derekmd\Dusk\DuskFile;
 use Illuminate\Console\Command;
 use Illuminate\Support\Env;
 use Illuminate\Support\Str;
@@ -27,7 +28,7 @@ class ChromeCommand extends Command
      *
      * @var string
      */
-    protected $environmentVariable = PHP_EOL.'DUSK_CHROME=1'.PHP_EOL;
+    protected $environmentVariable = PHP_EOL.'DUSK_CHROME=1 # added by Artisan command "dusk:chrome"'.PHP_EOL;
 
     /**
      * Create a new command instance.
@@ -55,8 +56,10 @@ class ChromeCommand extends Command
             return 1;
         }
 
-        if (! $this->putEnvironmentVariable()) {
-            $this->error('Unable to update file '.$this->duskFile().'. Check the file exists and has write permissions.');
+        $duskFile = new DuskFile($this->laravel->environment());
+
+        if (! $duskFile->append($this->environmentVariable)) {
+            $this->error('Unable to update '.$duskFile->path().'. Check the file exists and has write permissions.');
 
             return 1;
         }
@@ -66,7 +69,7 @@ class ChromeCommand extends Command
                 '--without-tty' => $this->option('without-tty'),
             ]);
         } finally {
-            $this->clearEnvironmentVariable();
+            $duskFile->clear($this->environmentVariable);
         }
     }
 
@@ -81,68 +84,12 @@ class ChromeCommand extends Command
     }
 
     /**
+     * Get DuskTestCase.php code from the filesystem.
+     *
      * @return string|bool
      */
     protected function duskTestCaseContents()
     {
         return file_get_contents(base_path('tests/DuskTestCase.php'));
-    }
-
-    /**
-     * Write the temporary environment variable to the .env.dusk.
-     *
-     * @return bool
-     */
-    protected function putEnvironmentVariable()
-    {
-        if (! file_exists($file = $this->duskFile())) {
-            return false;
-        }
-
-        if (($contents = file_get_contents($file)) === false) {
-            return false;
-        }
-
-        if (! file_put_contents($file, $contents.$this->environmentVariable)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Remove the temporary variable from the .env.dusk file.
-     */
-    protected function clearEnvironmentVariable()
-    {
-        if (! file_exists($file = $this->duskFile())) {
-            return;
-        }
-
-        if (($contents = file_get_contents($file)) === false) {
-            return;
-        }
-
-        file_put_contents($file, str_replace($this->environmentVariable, '', $contents));
-    }
-
-    /**
-     * Get the path of the Dusk file for the environment.
-     *
-     * @return string
-     */
-    protected function duskFile()
-    {
-        static $file;
-
-        if ($file === null) {
-            $file = base_path('.env.dusk.'.$this->laravel->environment());
-
-            if (! file_exists($file)) {
-                $file = base_path('.env.dusk');
-            }
-        }
-
-        return $file;
     }
 }
