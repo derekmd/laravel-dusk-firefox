@@ -48,8 +48,6 @@ This will overwrite file `tests/DuskTestCase.php` in your application to support
 php artisan dusk
 ```
 
-> Currently, Laravel developers using Geckodriver in Windows environments must also install [Microsoft Visual Studio redistributable runtime](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads) separately. Geckodriver's release notes from Oct 2019 indicate this manual dependency will eventually be fixed.
-
 <a name="updating-geckodriver"></a>
 ## Updating Geckodriver
 

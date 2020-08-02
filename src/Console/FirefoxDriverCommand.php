@@ -104,11 +104,6 @@ class FirefoxDriverCommand extends Command
             $this->option('all') ? 'binaries' : 'binary',
             $version,
         ]));
-
-        if (OperatingSystem::onWindows()) {
-            $this->comment('Geckodriver on Windows requires installing Microsoft Visual Studio redistributable runtime.');
-            $this->comment('Download binaries at https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads');
-        }
     }
 
     /**
