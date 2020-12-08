@@ -82,16 +82,14 @@ class FirefoxDriverCommandTest extends TestCase
 
         $http->shouldReceive('request')
             ->with('GET', 'https://api.github.com/repos/mozilla/geckodriver/releases/latest', [])
-            ->andReturn($versionResponse = m::mock(ResponseInterface::class));
-        $versionResponse->shouldReceive('getBody')
-            ->andReturn(file_get_contents(__DIR__.'/fixtures/geckodriver-latest.json'));
+            ->andReturn($this->mockDownloadResponse(__DIR__.'/fixtures/geckodriver-latest.json'));
 
         $http->shouldReceive('request')->with(
             'GET',
             'https://github.com/mozilla/geckodriver/releases/download/v0.26.0/'.$this->archiveFilename,
             ['sink' => $this->tempDir.'/'.$this->archiveFilename]
         )->andReturnUsing(function () {
-            copy(__DIR__.'/fixtures/'.$this->archiveFilename, $this->tempDir.'/'.$this->archiveFilename);
+            return $this->copyMockBinary($this->archiveFilename);
         });
 
         $this->artisan('dusk:firefox-driver', ['--output' => $this->tempDir])
@@ -113,9 +111,7 @@ class FirefoxDriverCommandTest extends TestCase
                 'proxy' => 'tcp://127.0.0.1:9000',
                 'verify' => false,
             ]
-        )->andReturn($versionResponse = m::mock(ResponseInterface::class));
-        $versionResponse->shouldReceive('getBody')
-            ->andReturn(file_get_contents(__DIR__.'/fixtures/geckodriver-latest.json'));
+        )->andReturn($this->mockDownloadResponse(__DIR__.'/fixtures/geckodriver-latest.json'));
 
         $http->shouldReceive('request')->with(
             'GET',
@@ -126,7 +122,7 @@ class FirefoxDriverCommandTest extends TestCase
                 'verify' => false,
             ]
         )->andReturnUsing(function () {
-            copy(__DIR__.'/fixtures/'.$this->archiveFilename, $this->tempDir.'/'.$this->archiveFilename);
+            return $this->copyMockBinary($this->archiveFilename);
         });
 
         $this->artisan('dusk:firefox-driver', [
@@ -147,16 +143,14 @@ class FirefoxDriverCommandTest extends TestCase
 
         $http->shouldReceive('request')
             ->with('GET', 'https://api.github.com/repos/mozilla/geckodriver/releases/latest', [])
-            ->andReturn($versionResponse = m::mock(ResponseInterface::class));
-        $versionResponse->shouldReceive('getBody')
-            ->andReturn(file_get_contents(__DIR__.'/fixtures/geckodriver-latest.json'));
+            ->andReturn($this->mockDownloadResponse(__DIR__.'/fixtures/geckodriver-latest.json'));
 
         $http->shouldReceive('request')->with(
             'GET',
             'https://github.com/mozilla/geckodriver/releases/download/v0.26.0/geckodriver-v0.26.0-win64.zip',
             ['sink' => $this->tempDir.'/geckodriver-v0.26.0-win64.zip']
         )->andReturnUsing(function () {
-            copy(__DIR__.'/fixtures/geckodriver-v0.26.0-win64.zip', $this->tempDir.'/geckodriver-v0.26.0-win64.zip');
+            return $this->copyMockBinary('geckodriver-v0.26.0-win64.zip');
         });
 
         $http->shouldReceive('request')->with(
@@ -164,7 +158,7 @@ class FirefoxDriverCommandTest extends TestCase
             'https://github.com/mozilla/geckodriver/releases/download/v0.26.0/geckodriver-v0.26.0-macos.tar.gz',
             ['sink' => $this->tempDir.'/geckodriver-v0.26.0-macos.tar.gz']
         )->andReturnUsing(function () {
-            copy(__DIR__.'/fixtures/geckodriver-v0.26.0-macos.tar.gz', $this->tempDir.'/geckodriver-v0.26.0-macos.tar.gz');
+            return $this->copyMockBinary('geckodriver-v0.26.0-macos.tar.gz');
         });
 
         $http->shouldReceive('request')->with(
@@ -172,7 +166,7 @@ class FirefoxDriverCommandTest extends TestCase
             'https://github.com/mozilla/geckodriver/releases/download/v0.26.0/geckodriver-v0.26.0-linux64.tar.gz',
             ['sink' => $this->tempDir.'/geckodriver-v0.26.0-linux64.tar.gz']
         )->andReturnUsing(function () {
-            copy(__DIR__.'/fixtures/geckodriver-v0.26.0-linux64.tar.gz', $this->tempDir.'/geckodriver-v0.26.0-linux64.tar.gz');
+            return $this->copyMockBinary('geckodriver-v0.26.0-linux64.tar.gz');
         });
 
         $this->artisan('dusk:firefox-driver', [
@@ -214,5 +208,21 @@ class FirefoxDriverCommandTest extends TestCase
 
         $this->assertFileDoesNotExist($this->tempDir.'/'.$this->archiveFilename);
         $this->assertFileDoesNotExist($this->tempDir.'/'.$this->binaryFilename, 'foo');
+    }
+
+    protected function mockDownloadResponse($path)
+    {
+        $response = m::mock(ResponseInterface::class);
+        $response->shouldReceive('getBody')
+            ->andReturn(file_get_contents($path));
+
+        return $response;
+    }
+
+    protected function copyMockBinary($filename)
+    {
+        copy(__DIR__.'/fixtures/'.$filename, $this->tempDir.'/'.$filename);
+
+        return $this->mockDownloadResponse(__DIR__.'/fixtures/'.$filename);
     }
 }
