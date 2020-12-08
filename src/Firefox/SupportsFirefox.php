@@ -113,4 +113,14 @@ trait SupportsFirefox
     {
         static::$firefoxDriver = $path;
     }
+
+    /**
+     * Determine if the tests are running within Laravel Sail.
+     *
+     * @return bool
+     */
+    protected static function runningFirefoxInSail()
+    {
+        return isset($_ENV['LARAVEL_SAIL']) && $_ENV['LARAVEL_SAIL'] == '1';
+    }
 }

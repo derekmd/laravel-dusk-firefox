@@ -10,6 +10,7 @@ This package will make [Laravel Dusk](https://github.com/laravel/dusk/) browser 
 * [Running both Firefox & Google Chrome](#running-firefox-and-chrome)
   * [Selecting desired browser in local environment](#selecting-browser-in-local)
   * [Selecting desired browser in continuous integration](#selecting-browser-in-ci)
+* [Running with Laravel Sail](#running-with-laravel-sail)
 * [Development](#development)
 * [FAQ](#faq)
 * [Contributing](#contributing)
@@ -156,6 +157,49 @@ This command will append environment variable `DUSK_CHROME=1` to your .env.dusk 
 #### Selecting desired browser in continuous integration
 
 When running automated test flows through tools such as Chipper CI, CircleCI, Travis CI, or Github Actions, you can setup one job to run Google Chrome and a second job for Firefox. The custom Artisan commands can be skipped and you can instead just set the environment variable. The job configured with `DUSK_CHROME=1` will run Google Chrome. The second job missing the environment variable defaults to Firefox.
+
+<a name="running-with-laravel-sail"></a>
+## Running with Laravel Sail
+
+Laravel Sail is a command-line interface for interacting with your Laravel application's Docker development environment. Laravel Dusk tests can run in Firefox once an additional Docker image is added to Sail's configuration file.
+
+Install this package using the `sail` commands:
+
+```
+./vendor/bin/sail composer require --dev derekmd/laravel-dusk-firefox
+./vendor/bin/sail artisan dusk:install-firefox
+```
+
+This will copy a `tests/DuskTestCase.php` file into your application that is configured to recognize Laravel Sail's environment variables.
+
+Now you must uncomment and edit the "selenium" service in the `docker-compose.yml` file to install [standalone Firefox for Selenium](https://github.com/SeleniumHQ/docker-selenium).
+
+```
+version: '3'
+services:
+    laravel.test:
+        # ....
+        depends_on:
+            - mysql
+            - redis
+            - selenium
+    selenium:
+        image: 'selenium/standalone-firefox'
+        volumes:
+            - '/dev/shm:/dev/shm'
+        networks:
+            - sail
+        depends_on:
+            - laravel.test
+```
+
+After saving your changes, run Laravel Dusk tests in Firefox by executing the command:
+
+```
+./vendor/bin/sail dusk
+```
+
+> This configuration only allows running Dusk test with Mozilla Firefox. To make the command `php artisan dusk:chrome` work with a "selenium/standalone-chrome" image, additional service and `sail.sh` file changes are required that fall outside the 80% use case of Laravel Sail.
 
 <a name="development"></a>
 ## Development

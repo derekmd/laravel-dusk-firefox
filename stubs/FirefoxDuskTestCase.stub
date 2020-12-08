@@ -20,6 +20,10 @@ abstract class DuskTestCase extends BaseTestCase
      */
     public static function prepare()
     {
+        if (static::runningFirefoxInSail()) {
+            return;
+        }
+
         static::startFirefoxDriver();
     }
 
@@ -43,6 +47,9 @@ abstract class DuskTestCase extends BaseTestCase
         $capabilities->getCapability(FirefoxDriver::PROFILE)
             ->setPreference('devtools.console.stdout.content', true);
 
-        return RemoteWebDriver::create('http://localhost:4444', $capabilities);
+        return RemoteWebDriver::create(
+            $_ENV['DUSK_DRIVER_URL'] ?? 'http://localhost:4444',
+            $capabilities
+        );
     }
 }
