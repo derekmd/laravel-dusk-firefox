@@ -15,7 +15,8 @@ class InstallCommand extends Command
                 {--with-chrome : Include a Chromedriver configuration in the DuskTestCase class.}
                 {--proxy= : The proxy to download the binary through (example: "tcp://127.0.0.1:9000")}
                 {--ssl-no-verify : Bypass SSL certificate verification when installing through a proxy}
-                {--output= : Directory path to copy test class into. (debug-only option)}';
+                {--output= : Directory path to copy test class into. (debug-only option)}
+                {--force : Do not ask to install, overwrites DuskTestCase.php (for ci environments)}';
 
     /**
      * The console command description.
@@ -39,9 +40,7 @@ class InstallCommand extends Command
 
         $stubDestination = ($this->option('output') ?: base_path('tests')).'/DuskTestCase.php';
 
-        if (file_exists($stubDestination) &&
-            ! $this->confirm("Overwrite file $stubDestination?")
-        ) {
+        if (!$this->option('force') && file_exists($stubDestination) && !$this->confirm("Overwrite file $stubDestination?")) {
             $this->comment("Firefox scaffolding not installed.");
 
             return;
