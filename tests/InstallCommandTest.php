@@ -87,15 +87,14 @@ class InstallCommandTest extends TestCase
         $this->assertStringEqualsFile($this->tempDir.'/DuskTestCase.php', 'foo');
     }
 
-
-    public function test_it_can_overwrite_existing_test_class_when_forced()
+    public function test_it_can_overwrite_test_class_unprompted()
     {
         file_put_contents($this->tempDir.'/DuskTestCase.php', 'foo');
 
         $this->artisan('dusk:install-firefox', [
             '--output' => $this->tempDir,
             '--with-chrome' => true,
-            '--force' => 1,
+            '--force' => true,
         ])
             ->expectsOutput('Firefox scaffolding installed successfully.')
             ->expectsOutput('Downloading Geckodriver binaries...')
