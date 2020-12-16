@@ -11,6 +11,8 @@ This package will make [Laravel Dusk](https://github.com/laravel/dusk/) browser 
   * [Selecting desired browser in local environment](#selecting-browser-in-local)
   * [Selecting desired browser in continuous integration](#selecting-browser-in-ci)
 * [Running with Laravel Sail](#running-with-laravel-sail)
+  * Developing only with Laraval Sail
+  * Mixing other development environments with Laravel Sail
 * [Development](#development)
 * [FAQ](#faq)
 * [Contributing](#contributing)
@@ -163,16 +165,7 @@ When running automated test flows through tools such as Chipper CI, CircleCI, Tr
 
 Laravel Sail is a command-line interface for interacting with your Laravel application's Docker development environment. Laravel Dusk tests can run in Firefox once an additional Docker image is added to Sail's configuration file.
 
-Install this package using the `sail` commands:
-
-```
-./vendor/bin/sail composer require --dev derekmd/laravel-dusk-firefox
-./vendor/bin/sail artisan dusk:install-firefox
-```
-
-This will copy a `tests/DuskTestCase.php` file into your application that is configured to recognize Laravel Sail's environment variables.
-
-Now you must uncomment and edit the "selenium" service in the `docker-compose.yml` file to install [standalone Firefox for Selenium](https://github.com/SeleniumHQ/docker-selenium).
+You must uncomment and edit the "selenium" service in the `docker-compose.yml` file to install [standalone Firefox for Selenium](https://github.com/SeleniumHQ/docker-selenium).
 
 ```
 version: '3'
@@ -193,10 +186,36 @@ services:
             - laravel.test
 ```
 
-After saving your changes, run Laravel Dusk tests in Firefox by executing the command:
+### Developing only with Laraval Sail
+
+**You may not require this package** if you exclusively use Laravel Sail for development.
+
+Over 90% of this package's solution is focused on managing a local Geckodriver process through PHPUnit's event hooks. Laravel Sail replaces Chromedriver/Geckodriver with a Selenium server so the only custom code you'll require in your application a WebDriver configuration for Firefox. Simply
+[copy this driver() method](https://github.com/derekmd/laravel-dusk-firefox/blob/58d10303c580b120d0f70cb4a202d188c89a192b/stubs/FirefoxDuskTestCase.stub#L37-L52) into your Laravel Dusk `tests/DuskTestCase.php` file. Then use the above `docker-compose.yml` instructions to install Docker image "selenium/standalone-firefox".
+
+### Mixing other development environments with Laravel Sail
+
+For projects that have a team of developers across many environments (local native development, Laravel Valet, Laravel Homestead, Laravel Sail) or use a Docker-less continuous integration, this package will allow Laravel Dusk to run Firefox in any of those environments.
+
+Install the package using the `sail` commands:
+
+```
+./vendor/bin/sail composer require --dev derekmd/laravel-dusk-firefox
+./vendor/bin/sail artisan dusk:install-firefox
+```
+
+This will copy a `tests/DuskTestCase.php` file into your application that is configured to recognize Laravel Sail's environment variables. When Sail isn't installed, Laravel Dusk will behave as normal.
+
+Run Laravel Dusk tests in Firefox by executing the command:
 
 ```
 ./vendor/bin/sail dusk
+```
+
+Other developers not using Laravel Sail can execute the usual Dusk command:
+
+```
+php artisan dusk
 ```
 
 > This configuration only allows running Dusk test with Mozilla Firefox. To make the command `php artisan dusk:chrome` work with a "selenium/standalone-chrome" image, additional service and `sail.sh` file changes are required that fall outside the 80% use case of Laravel Sail.
