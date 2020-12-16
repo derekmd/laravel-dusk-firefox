@@ -190,8 +190,7 @@ services:
 
 **You may not require this package** if you exclusively use Laravel Sail for development.
 
-Over 90% of this package's solution is focused on managing a local Geckodriver process through PHPUnit's event hooks. Laravel Sail replaces Chromedriver/Geckodriver with a Selenium server so the only custom code you'll require in your application a WebDriver configuration for Firefox. Simply
-[copy this driver() method](https://github.com/derekmd/laravel-dusk-firefox/blob/58d10303c580b120d0f70cb4a202d188c89a192b/stubs/FirefoxDuskTestCase.stub#L37-L52) into your Laravel Dusk `tests/DuskTestCase.php` file. Then use the above `docker-compose.yml` instructions to install Docker image "selenium/standalone-firefox".
+Over 90% of this package's solution is focused on managing a local Geckodriver process through PHPUnit's event hooks. Laravel Sail replaces Chromedriver/Geckodriver with a Selenium server so the only custom code you'll require in your application is a WebDriver configuration for Firefox. [Copy this driver() method](https://github.com/derekmd/laravel-dusk-firefox/blob/58d10303c580b120d0f70cb4a202d188c89a192b/stubs/FirefoxDuskTestCase.stub#L37-L52) into your application's `tests/DuskTestCase.php` file. Then use the above `docker-compose.yml` instructions to install Docker image "selenium/standalone-firefox".
 
 ### Mixing other development environments with Laravel Sail
 
