@@ -182,8 +182,6 @@ services:
             - '/dev/shm:/dev/shm'
         networks:
             - sail
-        depends_on:
-            - laravel.test
 ```
 
 ### Developing only with Laraval Sail
