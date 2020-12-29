@@ -21,7 +21,7 @@
     ],
     "require": {
         "php": "^7.2.5",
-        "guzzlehttp/guzzle": "^6.0|^7.0",
+        "guzzlehttp/guzzle": "^6.0|^7.0|^8.0",
         "laravel/dusk": "^6.0"
     },
     "require-dev": {
