@@ -1,0 +1,38 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        php: [7.3, 7.4, 8.0]
+
+    name: PHP ${{ matrix.php }}
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php }}
+        extensions: dom, curl, libxml, mbstring, zip
+        tools: composer:v2
+        coverage: none
+
+    - name: Install dependencies
+      run: |
+        composer require "phpunit/phpunit:^9.0" --dev --no-update
+        composer update --prefer-dist --no-interaction --no-progress --ansi
+
+    - name: Install Geckodriver
+      run: vendor/phpunit/phpunit/phpunit tests/DownloadBinaries.php
+
+    - name: Execute tests
+      run: vendor/phpunit/phpunit/phpunit --verbose

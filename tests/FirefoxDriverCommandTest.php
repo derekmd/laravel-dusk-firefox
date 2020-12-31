@@ -49,11 +49,11 @@ class FirefoxDriverCommandTest extends TestCase
     {
         switch (PHP_OS_FAMILY) {
             case 'Windows':
-                return 'geckodriver-v0.26.0-win64.zip';
+                return 'geckodriver-v0.28.0-win64.zip';
             case 'Darwin':
-                return 'geckodriver-v0.26.0-macos.tar.gz';
+                return 'geckodriver-v0.28.0-macos.tar.gz';
             default:
-                return 'geckodriver-v0.26.0-linux64.tar.gz';
+                return 'geckodriver-v0.28.0-linux64.tar.gz';
         }
     }
 
@@ -86,14 +86,14 @@ class FirefoxDriverCommandTest extends TestCase
 
         $http->shouldReceive('request')->with(
             'GET',
-            'https://github.com/mozilla/geckodriver/releases/download/v0.26.0/'.$this->archiveFilename,
+            'https://github.com/mozilla/geckodriver/releases/download/v0.28.0/'.$this->archiveFilename,
             ['sink' => $this->tempDir.'/'.$this->archiveFilename]
         )->andReturnUsing(function () {
             return $this->copyMockBinary($this->archiveFilename);
         });
 
         $this->artisan('dusk:firefox-driver', ['--output' => $this->tempDir])
-            ->expectsOutput('Geckodriver binary successfully installed for version v0.26.0.')
+            ->expectsOutput('Geckodriver binary successfully installed for version v0.28.0.')
             ->assertExitCode(0);
 
         $this->assertFileDoesNotExist($this->tempDir.'/'.$this->archiveFilename);
@@ -115,7 +115,7 @@ class FirefoxDriverCommandTest extends TestCase
 
         $http->shouldReceive('request')->with(
             'GET',
-            'https://github.com/mozilla/geckodriver/releases/download/v0.26.0/'.$this->archiveFilename,
+            'https://github.com/mozilla/geckodriver/releases/download/v0.28.0/'.$this->archiveFilename,
             [
                 'sink' => $this->tempDir.'/'.$this->archiveFilename,
                 'proxy' => 'tcp://127.0.0.1:9000',
@@ -130,7 +130,7 @@ class FirefoxDriverCommandTest extends TestCase
             '--proxy' => 'tcp://127.0.0.1:9000',
             '--ssl-no-verify' => true,
         ])
-            ->expectsOutput('Geckodriver binary successfully installed for version v0.26.0.')
+            ->expectsOutput('Geckodriver binary successfully installed for version v0.28.0.')
             ->assertExitCode(0);
 
         $this->assertFileDoesNotExist($this->tempDir.'/'.$this->archiveFilename);
@@ -147,42 +147,42 @@ class FirefoxDriverCommandTest extends TestCase
 
         $http->shouldReceive('request')->with(
             'GET',
-            'https://github.com/mozilla/geckodriver/releases/download/v0.26.0/geckodriver-v0.26.0-win64.zip',
-            ['sink' => $this->tempDir.'/geckodriver-v0.26.0-win64.zip']
+            'https://github.com/mozilla/geckodriver/releases/download/v0.28.0/geckodriver-v0.28.0-win64.zip',
+            ['sink' => $this->tempDir.'/geckodriver-v0.28.0-win64.zip']
         )->andReturnUsing(function () {
-            return $this->copyMockBinary('geckodriver-v0.26.0-win64.zip');
+            return $this->copyMockBinary('geckodriver-v0.28.0-win64.zip');
         });
 
         $http->shouldReceive('request')->with(
             'GET',
-            'https://github.com/mozilla/geckodriver/releases/download/v0.26.0/geckodriver-v0.26.0-macos.tar.gz',
-            ['sink' => $this->tempDir.'/geckodriver-v0.26.0-macos.tar.gz']
+            'https://github.com/mozilla/geckodriver/releases/download/v0.28.0/geckodriver-v0.28.0-macos.tar.gz',
+            ['sink' => $this->tempDir.'/geckodriver-v0.28.0-macos.tar.gz']
         )->andReturnUsing(function () {
-            return $this->copyMockBinary('geckodriver-v0.26.0-macos.tar.gz');
+            return $this->copyMockBinary('geckodriver-v0.28.0-macos.tar.gz');
         });
 
         $http->shouldReceive('request')->with(
             'GET',
-            'https://github.com/mozilla/geckodriver/releases/download/v0.26.0/geckodriver-v0.26.0-linux64.tar.gz',
-            ['sink' => $this->tempDir.'/geckodriver-v0.26.0-linux64.tar.gz']
+            'https://github.com/mozilla/geckodriver/releases/download/v0.28.0/geckodriver-v0.28.0-linux64.tar.gz',
+            ['sink' => $this->tempDir.'/geckodriver-v0.28.0-linux64.tar.gz']
         )->andReturnUsing(function () {
-            return $this->copyMockBinary('geckodriver-v0.26.0-linux64.tar.gz');
+            return $this->copyMockBinary('geckodriver-v0.28.0-linux64.tar.gz');
         });
 
         $this->artisan('dusk:firefox-driver', [
             '--all' => true,
             '--output' => $this->tempDir,
         ])
-            ->expectsOutput('Geckodriver binaries successfully installed for version v0.26.0.')
+            ->expectsOutput('Geckodriver binaries successfully installed for version v0.28.0.')
             ->assertExitCode(0);
 
-        $this->assertFileDoesNotExist($this->tempDir.'/geckodriver-v0.26.0-win64.zip');
+        $this->assertFileDoesNotExist($this->tempDir.'/geckodriver-v0.28.0-win64.zip');
         $this->assertStringEqualsFile($this->tempDir.'/geckodriver-win.exe', 'foo');
 
-        $this->assertFileDoesNotExist($this->tempDir.'/geckodriver-v0.26.0-macos.tar.gz');
+        $this->assertFileDoesNotExist($this->tempDir.'/geckodriver-v0.28.0-macos.tar.gz');
         $this->assertStringEqualsFile($this->tempDir.'/geckodriver-mac', 'foo');
 
-        $this->assertFileDoesNotExist($this->tempDir.'/geckodriver-v0.26.0-linux64.tar.gz');
+        $this->assertFileDoesNotExist($this->tempDir.'/geckodriver-v0.28.0-linux64.tar.gz');
         $this->assertStringEqualsFile($this->tempDir.'/geckodriver-linux', 'foo');
     }
 
@@ -192,13 +192,13 @@ class FirefoxDriverCommandTest extends TestCase
             new Response(200, [], file_get_contents(__DIR__.'/fixtures/geckodriver-latest.json')),
             new RequestException(
                 'curl (7): Failed to connect to api.github.com port 80: Connection refused',
-                new Request('GET', 'https://github.com/mozilla/geckodriver/releases/download/v0.26.0/'.$this->archiveFilename)
+                new Request('GET', 'https://github.com/mozilla/geckodriver/releases/download/v0.28.0/'.$this->archiveFilename)
             )
         ]));
         $http = new Client(['handler' => $handlerStack]);
         $this->app->instance(Client::class, $http);
 
-        $expectedError = 'Failed to download https://github.com/mozilla/geckodriver/releases/download/v0.26.0/'.
+        $expectedError = 'Failed to download https://github.com/mozilla/geckodriver/releases/download/v0.28.0/'.
             $this->archiveFilename.
             ': curl (7): Failed to connect to api.github.com port 80: Connection refused';
 
