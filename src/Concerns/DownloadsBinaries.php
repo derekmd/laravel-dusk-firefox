@@ -67,16 +67,25 @@ trait DownloadsBinaries
      */
     protected function extractTarball($archive)
     {
-        $gzip = new PharData($archive);
-        $gzip->convertToData(Phar::ZIP);
+        $output = [];
+        $exitCode = 0;
 
-        $zipArchive = str_replace('tar.gz', 'zip', $archive);
+        $isSuccessful = exec(vsprintf('tar -xvzf %s -C %s', [
+            escapeshellarg($archive),
+            escapeshellarg($this->directory),
+        ]), $output, $exitCode);
 
-        $binary = $this->extractZip($zipArchive);
+        if ($isSuccessful === false || $exitCode !== 0) {
+            throw new RuntimeException('Unable to execute "tar" to extract downloaded file '.$archive);
+        }
 
-        unlink($zipArchive);
+        if (empty($output)) {
+            throw new RuntimeException('Unable to find executable in downloaded file '.$archive);
+        }
 
-        return $binary;
+        $binaryPath = $output[count($output) - 1];
+
+        return basename($binaryPath);
     }
 
     /**
