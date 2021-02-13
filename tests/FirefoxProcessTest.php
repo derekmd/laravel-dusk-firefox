@@ -46,6 +46,10 @@ class FirefoxProcessTest extends TestCase
     public function test_invalid_path()
     {
         $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(
+            'Invalid path to Geckodriver [/not/a/valid/path]. '.
+            'Make sure to install the Geckodriver first by running the dusk:firefox-driver command.'
+        );
 
         (new FirefoxProcess('/not/a/valid/path'))->toProcess();
     }

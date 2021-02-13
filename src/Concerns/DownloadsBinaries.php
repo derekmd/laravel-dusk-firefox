@@ -5,6 +5,7 @@ namespace Derekmd\Dusk\Concerns;
 use Derekmd\Dusk\Exceptions\DownloadException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use RuntimeException;
 use Phar;
 use PharData;
 use ZipArchive;
@@ -21,19 +22,26 @@ trait DownloadsBinaries
     /**
      * Extract the binary from the archive and delete the archive.
      *
-     * @param  string  $archive
-     * @param  string  $slug
+     * @param  string  $archive  Path to the file being extracted.
+     * @param  string  $slug  Name of the file being extracted.
+     * @param  string  $directory  Destination path for the extraction.
      * @return string
+     *
+     * @throws \RuntimeException
      */
-    protected function extract($archive, $slug)
+    protected function extract($archive, $slug, $directory)
     {
         if (preg_match('/\.zip$/', $slug)) {
-            $binary = $this->extractZip($archive);
+            $binary = $this->extractZip($archive, $directory);
         } else {
-            $binary = $this->extractTarball($archive);
+            $binary = $this->extractTarball($archive, $directory);
         }
 
         unlink($archive);
+
+        if (empty($binary)) {
+            throw new RuntimeException("Unable to find executable in downloaded file $archive");
+        }
 
         return $binary;
     }
@@ -42,15 +50,16 @@ trait DownloadsBinaries
      * Extract the binary from the .zip archive.
      *
      * @param  string  $archive
+     * @param  string  $directory
      * @return string
      */
-    protected function extractZip($archive)
+    protected function extractZip($archive, $directory)
     {
         $zip = new ZipArchive;
 
         $zip->open($archive);
 
-        $zip->extractTo($this->directory);
+        $zip->extractTo($directory);
 
         $binary = $zip->getNameIndex(0);
 
@@ -63,29 +72,61 @@ trait DownloadsBinaries
      * Extract the binary from the .tar.gz archive.
      *
      * @param  string  $archive
-     * @return string
+     * @param  string  $directory
+     * @return string|null
+     *
+     * @throws \RuntimeException
      */
-    protected function extractTarball($archive)
+    protected function extractTarball($archive, $directory)
     {
         $output = [];
         $exitCode = 0;
 
         $isSuccessful = exec(vsprintf('tar -xvzf %s -C %s', [
             escapeshellarg($archive),
-            escapeshellarg($this->directory),
+            escapeshellarg($directory),
         ]), $output, $exitCode);
+
+        // Handle Mingw-w64 mounted paths.
+        if (in_array($exitCode, [2, 128], true) && preg_match('/^[A-Z]:/', $archive)) {
+            try {
+                return $this->extractTarball(
+                    $this->formatMountedWindowsPath($archive),
+                    $this->formatMountedWindowsPath($directory)
+                );
+            } catch (RuntimeException $e) {
+                // Suppress this and instead report below on the original path.
+            }
+        }
 
         if ($isSuccessful === false || $exitCode !== 0) {
             throw new RuntimeException('Unable to execute "tar" to extract downloaded file '.$archive);
         }
 
-        if (empty($output)) {
-            throw new RuntimeException('Unable to find executable in downloaded file '.$archive);
+        if (! empty($output)) {
+            $binaryPath = $output[count($output) - 1];
+
+            return basename($binaryPath);
+        }
+    }
+
+    /**
+     * Cygwin & Mingw-w64 use mounted paths. i.e., Unix commands like 'tar'
+     * can't handle the native Windows path C:\laravel-dusk-firefox/tests/bin.
+     * Instead reformat such a string as /c/laravel-dusk-firefox/tests/bin.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    protected function formatMountedWindowsPath($path)
+    {
+        if (preg_match('/^[A-Z]:/', $path, $matches)) {
+            return '/'.
+                strtolower($matches[0][0]).
+                str_replace('\\', '/', substr($path, 2));
         }
 
-        $binaryPath = $output[count($output) - 1];
-
-        return basename($binaryPath);
+        return $path;
     }
 
     /**

@@ -6,6 +6,7 @@ use Derekmd\Dusk\Concerns\DownloadsBinaries;
 use Derekmd\Dusk\Exceptions\DownloadException;
 use Illuminate\Console\Command;
 use Laravel\Dusk\OperatingSystem;
+use RuntimeException;
 
 /**
  * @copyright Proxy downloads are based on https://github.com/staudenmeir/dusk-updater
@@ -84,20 +85,41 @@ class FirefoxDriverCommand extends Command
 
         $currentOS = OperatingSystem::id();
 
+        $osSuccesses = [];
+        $osFailures = [];
+
         foreach ($this->slugs as $os => $slug) {
             if ($this->option('all') || ($os === $currentOS)) {
                 try {
                     $archive = $this->download($version, $slug);
-                } catch (DownloadException $e) {
+
+                    $binary = $this->extract($archive, $slug, $this->directory);
+
+                    $this->rename($binary, $os);
+
+                    $osSuccesses[] = $os;
+                } catch (DownloadException | RuntimeException $e) {
                     $this->error($e->getMessage());
 
-                    return 1;
+                    $osFailures[] = $os;
                 }
-
-                $binary = $this->extract($archive, $slug);
-
-                $this->rename($binary, $os);
             }
+        }
+
+        if (! empty($osFailures)) {
+            $this->info(vsprintf('Geckodriver binary installation failed for %s.', [
+                implode(', ', $osFailures)
+            ]));
+
+            if (! empty($osSuccesses)) {
+                $this->info(vsprintf('Geckodriver %s successfully installed for version %s on %s.', [
+                    count($osSuccesses) === 1 ? 'binary' : 'binaries',
+                    $version,
+                    implode(', ', $osSuccesses)
+                ]));
+            }
+
+            return 1;
         }
 
         $this->info(vsprintf('Geckodriver %s successfully installed for version %s.', [

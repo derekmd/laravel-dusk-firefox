@@ -11,25 +11,19 @@ class FirefoxProcess
     /**
      * The path to the Geckodriver.
      *
-     * @var string
+     * @var string|null
      */
     protected $driver;
 
     /**
      * Create a new FirefoxProcess instance.
      *
-     * @param  string  $driver
+     * @param  string|null  $driver
      * @return void
-     *
-     * @throws \RuntimeException
      */
     public function __construct($driver = null)
     {
         $this->driver = $driver;
-
-        if (! is_null($driver) && realpath($driver) === false) {
-            throw new RuntimeException("Invalid path to Geckodriver [{$driver}].");
-        }
     }
 
     /**
@@ -37,19 +31,28 @@ class FirefoxProcess
      *
      * @param  array  $arguments
      * @return \Symfony\Component\Process\Process
+     *
+     * @throws \RuntimeException
      */
     public function toProcess(array $arguments = [])
     {
         if ($this->driver) {
-            return $this->process($arguments);
+            $driver = $this->driver;
+        } elseif ($this->onWindows()) {
+            $driver = __DIR__.'/../../bin/geckodriver-win.exe';
+        } elseif ($this->onMac()) {
+            $driver = __DIR__.'/../../bin/geckodriver-mac';
+        } else {
+            $driver = __DIR__.'/../../bin/geckodriver-linux';
         }
 
-        if ($this->onWindows()) {
-            $this->driver = realpath(__DIR__.'/../../bin/geckodriver-win.exe');
-        } elseif ($this->onMac()) {
-            $this->driver = realpath(__DIR__.'/../../bin/geckodriver-mac');
-        } else {
-            $this->driver = realpath(__DIR__.'/../../bin/geckodriver-linux');
+        $this->driver = realpath($driver);
+
+        if ($this->driver === false) {
+            throw new RuntimeException(
+                'Invalid path to Geckodriver ['.$driver.']. '.
+                'Make sure to install the Geckodriver first by running the dusk:firefox-driver command.'
+            );
         }
 
         return $this->process($arguments);

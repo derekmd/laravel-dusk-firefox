@@ -19,6 +19,6 @@ class DownloadBinaries extends TestCase
             '--output' => __DIR__.'/../bin',
         ])->assertExitCode(0);
 
-        echo "Geckodriver binaries downloaded to the package's bin/ directory." . PHP_EOL;
+        echo "Geckodriver binaries downloaded to the package's bin/ directory.".PHP_EOL;
     }
 }
