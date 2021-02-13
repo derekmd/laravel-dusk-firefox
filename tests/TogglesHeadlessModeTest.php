@@ -4,8 +4,6 @@ namespace Derekmd\Dusk\Tests;
 
 use Derekmd\Dusk\Concerns\TogglesHeadlessMode;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
-use Symfony\Component\Process\Process;
 
 class TogglesHeadlessModeTest extends TestCase
 {

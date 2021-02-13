@@ -108,14 +108,14 @@ class FirefoxDriverCommand extends Command
 
         if (! empty($osFailures)) {
             $this->info(vsprintf('Geckodriver binary installation failed for %s.', [
-                implode(', ', $osFailures)
+                implode(', ', $osFailures),
             ]));
 
             if (! empty($osSuccesses)) {
                 $this->info(vsprintf('Geckodriver %s successfully installed for version %s on %s.', [
                     count($osSuccesses) === 1 ? 'binary' : 'binaries',
                     $version,
-                    implode(', ', $osSuccesses)
+                    implode(', ', $osSuccesses),
                 ]));
             }
 

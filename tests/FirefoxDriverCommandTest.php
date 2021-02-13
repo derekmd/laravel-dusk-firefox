@@ -223,7 +223,7 @@ class FirefoxDriverCommandTest extends TestCase
                     static::VERSION,
                     $this->archiveFilename,
                 ]))
-            )
+            ),
         ]));
         $http = new Client(['handler' => $handlerStack]);
         $this->app->instance(Client::class, $http);

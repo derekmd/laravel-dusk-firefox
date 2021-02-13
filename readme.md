@@ -275,6 +275,7 @@ or call PHPUnit directly:
 When submitting a pull request:
 
 1. Write new PHP code and docblock in the same style as the Laravel ecoystem. #NoTimeForTypehints
+   * Running command `./vendor/friendsofphp/php-cs-fixer/php-cs-fixer fix` will auto-correct the code styling.
 2. Add cases to the test suite to ensure code coverage is never reduced.
 3. Please do not try to support more browsers stubs beyond Chrome & Firefox.
 

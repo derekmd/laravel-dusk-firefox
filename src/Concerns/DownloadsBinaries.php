@@ -6,8 +6,6 @@ use Derekmd\Dusk\Exceptions\DownloadException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use RuntimeException;
-use Phar;
-use PharData;
 use ZipArchive;
 
 trait DownloadsBinaries

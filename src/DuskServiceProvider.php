@@ -2,7 +2,6 @@
 
 namespace Derekmd\Dusk;
 
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
 class DuskServiceProvider extends ServiceProvider

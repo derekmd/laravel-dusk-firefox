@@ -79,7 +79,7 @@ class ChromeCommand extends Command
      * @return bool
      */
     protected function hasChromedriverSetup()
-    {        
+    {
         return Str::contains($this->duskTestCaseContents(), 'startChromeDriver()');
     }
 

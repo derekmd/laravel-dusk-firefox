@@ -68,9 +68,9 @@ class InstallCommand extends Command
      * @return array
      */
     protected function stubFile()
-    {        
+    {
         if ($this->option('with-chrome')) {
-           return 'DuskTestCase.stub';
+            return 'DuskTestCase.stub';
         }
 
         return 'FirefoxDuskTestCase.stub';

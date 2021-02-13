@@ -34,7 +34,7 @@ trait SupportsFirefox
     {
         if (static::$firefoxLog) {
             $this->storeConsoleLog(
-               $this->getCallerName(), static::$firefoxLog->getOutput()
+                $this->getCallerName(), static::$firefoxLog->getOutput()
             );
 
             static::$firefoxLog = null;

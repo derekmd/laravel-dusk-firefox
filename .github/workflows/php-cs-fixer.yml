@@ -1,0 +1,16 @@
+name: Check PHP code style
+
+on: [push]
+
+jobs:
+    style:
+        runs-on: ubuntu-latest
+
+        steps:
+            -   name: Checkout code
+                uses: actions/checkout@v2
+
+            -   name: Check style
+                uses: docker://oskarstark/php-cs-fixer-ga
+                with:
+                    args: --config=.php_cs --dry-run --diff
