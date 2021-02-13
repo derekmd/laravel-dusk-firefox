@@ -86,6 +86,8 @@ After `tests/DuskTestCase.php` is copied into your application, you may update t
 ```php
 namespace Tests;
 
+use Derekmd\Dusk\Concerns\TogglesHeadlessMode;
+use Derekmd\Dusk\Firefox\SupportsFirefox;
 use Facebook\WebDriver\Firefox\FirefoxDriver;
 use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
@@ -98,11 +100,11 @@ abstract class DuskTestCase extends BaseTestCase
     protected function driver()
     {
         $options = [
-            'args' => [
+            'args' => $this->filterHeadlessArguments([
                 '--headless',
                 '--window-size=1920,1080',
             ],
-        ];
+        ]);
 
         $capabilities = DesiredCapabilities::firefox()
             ->setCapability('moz:firefoxOptions', $options);
@@ -118,6 +120,7 @@ abstract class DuskTestCase extends BaseTestCase
 * Firefox profile boolean flag `devtools.console.stdout.content` must be turned on to generate logs for debugging JavaScript errors.
 * `--headless` runs tests without opening any windows which is useful for continuous integrations. Remove this option to see the browser viewport while the test runs.
 * `--window-size` controls the width and height of the browser viewport. If your UI assertions are failing from elements being off-screen, you may need to change this setting.
+* The `$this->filterHeadlessArguments()` call allows the `--headless` argument to be removed when the command `php artisan dusk --browse` is run during local dev. This allows the Firefox browser window to be displayed while Laravel Dusk tests run. Headless mode is still enabled when the command line argument `--browse` isn't used.
 
 Read the [Geckodriver usage documentation](https://firefox-source-docs.mozilla.org/testing/geckodriver/index.html) to see which options are available.
 
