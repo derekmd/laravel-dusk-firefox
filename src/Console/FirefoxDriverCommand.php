@@ -4,8 +4,8 @@ namespace Derekmd\Dusk\Console;
 
 use Derekmd\Dusk\Concerns\DownloadsBinaries;
 use Derekmd\Dusk\Exceptions\DownloadException;
+use Derekmd\Dusk\OperatingSystem;
 use Illuminate\Console\Command;
-use Laravel\Dusk\OperatingSystem;
 use RuntimeException;
 
 /**
@@ -49,17 +49,6 @@ class FirefoxDriverCommand extends Command
     protected $downloadUrl = 'https://github.com/mozilla/geckodriver/releases/download/{version}/geckodriver-{version}-{os}';
 
     /**
-     * Download slugs for the available operating systems.
-     *
-     * @var array
-     */
-    protected $slugs = [
-        'linux' => 'linux64.tar.gz',
-        'mac' => 'macos.tar.gz',
-        'win' => 'win64.zip',
-    ];
-
-    /**
      * Path to the bin directory.
      *
      * @var string
@@ -83,26 +72,22 @@ class FirefoxDriverCommand extends Command
             return 1;
         }
 
-        $currentOS = OperatingSystem::id();
-
         $osSuccesses = [];
         $osFailures = [];
 
-        foreach ($this->slugs as $os => $slug) {
-            if ($this->option('all') || ($os === $currentOS)) {
-                try {
-                    $archive = $this->download($version, $slug);
+        foreach ($this->binaryStubNames() as $os => $slug) {
+            try {
+                $archive = $this->download($version, $slug);
 
-                    $binary = $this->extract($archive, $slug, $this->directory);
+                $binary = $this->extract($archive, $slug, $this->directory);
 
-                    $this->rename($binary, $os);
+                $this->rename($binary, $os);
 
-                    $osSuccesses[] = $os;
-                } catch (DownloadException | RuntimeException $e) {
-                    $this->error($e->getMessage());
+                $osSuccesses[] = $os;
+            } catch (DownloadException | RuntimeException $e) {
+                $this->error($e->getMessage());
 
-                    $osFailures[] = $os;
-                }
+                $osFailures[] = $os;
             }
         }
 
@@ -126,6 +111,22 @@ class FirefoxDriverCommand extends Command
             $this->option('all') ? 'binaries' : 'binary',
             $version,
         ]));
+    }
+
+    /**
+     * Stub name of the binary download for available operating systems.
+     *
+     * @return array
+     */
+    protected function binaryStubNames()
+    {
+        return collect([
+            'linux' => 'linux64.tar.gz',
+            'mac' => 'macos.tar.gz',
+            'win' => 'win64.zip',
+        ])->unless($this->option('all'), function ($items) {
+            return $items->only(OperatingSystem::parentId());
+        })->all();
     }
 
     /**
