@@ -106,6 +106,8 @@ trait DownloadsBinaries
 
             return basename($binaryPath);
         }
+
+        return 'geckodriver';
     }
 
     /**
