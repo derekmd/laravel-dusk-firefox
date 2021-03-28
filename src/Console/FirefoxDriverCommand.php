@@ -83,7 +83,7 @@ class FirefoxDriverCommand extends Command
             return 1;
         }
 
-        $currentOS = OperatingSystem::id();
+        $currentOS = explode('-', OperatingSystem::id())[0];
 
         $osSuccesses = [];
         $osFailures = [];
