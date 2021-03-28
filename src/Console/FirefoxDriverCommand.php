@@ -106,6 +106,12 @@ class FirefoxDriverCommand extends Command
             }
         }
 
+        if (empty($osFailures) && empty($osSuccesses)) {
+            $this->error('Nothing installed');
+
+            return 0;
+        }
+
         if (! empty($osFailures)) {
             $this->info(vsprintf('Geckodriver binary installation failed for %s.', [
                 implode(', ', $osFailures),
