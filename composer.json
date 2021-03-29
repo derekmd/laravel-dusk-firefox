@@ -26,9 +26,9 @@
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^2.18",
-        "mockery/mockery": "^1.4.2",
-        "orchestra/testbench": "^6.12.0",
-        "phpunit/phpunit": "^9.3"
+        "mockery/mockery": "^1.4",
+        "orchestra/testbench": "^6.15",
+        "phpunit/phpunit": "^9.5"
     },
     "autoload": {
         "psr-4": {
