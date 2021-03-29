@@ -5,7 +5,7 @@ on:
   pull_request:
 
 jobs:
-  tests:
+  linux_tests:
     runs-on: ubuntu-latest
 
     strategy:
@@ -28,11 +28,73 @@ jobs:
 
     - name: Install dependencies
       run: |
-        composer require "phpunit/phpunit:^9.0" --dev --no-update
+        composer require "phpunit/phpunit:^9.5" --dev --no-update
         composer update --prefer-dist --no-interaction --no-progress --ansi
 
     - name: Install Geckodriver
-      run: vendor/phpunit/phpunit/phpunit tests/DownloadBinaries.php
+      run: vendor/bin/phpunit tests/DownloadBinaries.php
 
     - name: Execute tests
-      run: vendor/phpunit/phpunit/phpunit --verbose
+      run: vendor/bin/phpunit --verbose
+  mac_tests:
+    runs-on: macos-latest
+
+    strategy:
+      matrix:
+        php: [8.0]
+
+    name: PHP ${{ matrix.php }}
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php }}
+        extensions: dom, curl, libxml, mbstring, zip
+        tools: composer:v2
+        coverage: none
+
+    - name: Install dependencies
+      run: |
+        composer require "phpunit/phpunit:^9.5" --dev --no-update
+        composer update --prefer-dist --no-interaction --no-progress --ansi
+
+    - name: Install Geckodriver
+      run: vendor/bin/phpunit tests/DownloadBinaries.php
+
+    - name: Execute tests
+      run: vendor/bin/phpunit --verbose
+  windows_tests:
+    runs-on: windows-latest
+
+    strategy:
+      matrix:
+        php: [8.0]
+
+    name: PHP ${{ matrix.php }}
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php }}
+        extensions: dom, curl, fileinfo, libxml, mbstring, zip
+        tools: composer:v2
+        coverage: none
+
+    - name: Install dependencies
+      run: |
+        composer require "phpunit/phpunit:^9.5" --dev --no-update
+        composer update --prefer-dist --no-interaction --no-progress --ansi
+
+    - name: Install Geckodriver
+      run: vendor/bin/phpunit tests/DownloadBinaries.php
+
+    - name: Execute tests
+      run: vendor/bin/phpunit --verbose
