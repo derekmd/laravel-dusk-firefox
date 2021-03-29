@@ -5,6 +5,8 @@ namespace Derekmd\Dusk\Concerns;
 use Derekmd\Dusk\Exceptions\DownloadException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Support\ProcessUtils;
+use Illuminate\Support\Str;
 use RuntimeException;
 use ZipArchive;
 
@@ -80,9 +82,9 @@ trait DownloadsBinaries
         $output = [];
         $exitCode = 0;
 
-        $isSuccessful = exec(vsprintf('tar -xvzf %s -C %s', [
-            escapeshellarg($archive),
-            escapeshellarg($directory),
+        $isSuccessful = exec(vsprintf('tar -xvzf %s -C %s 2>&1', [
+            ProcessUtils::escapeArgument($archive),
+            ProcessUtils::escapeArgument($directory),
         ]), $output, $exitCode);
 
         // Handle Mingw-w64 mounted paths.
@@ -98,11 +100,19 @@ trait DownloadsBinaries
         }
 
         if ($isSuccessful === false || $exitCode !== 0) {
-            throw new RuntimeException('Unable to execute "tar" to extract downloaded file '.$archive);
+            throw new RuntimeException(collect([
+                'Unable to execute "tar" to extract downloaded file '.$archive,
+            ])->when($output, function ($message, $output) {
+                return $message->push('Output:')->merge($output);
+            })->join("\n"));
         }
 
         if (! empty($output)) {
             $binaryPath = $output[count($output) - 1];
+
+            if (Str::startsWith($binaryPath, 'x ')) {
+                $binaryPath = Str::after($binaryPath, 'x ');
+            }
 
             return basename($binaryPath);
         }
