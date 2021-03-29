@@ -110,11 +110,7 @@ trait DownloadsBinaries
         if (! empty($output)) {
             $binaryPath = $output[count($output) - 1];
 
-            if (Str::startsWith($binaryPath, 'x ')) {
-                $binaryPath = Str::after($binaryPath, 'x ');
-            }
-
-            return basename($binaryPath);
+            return basename(Str::after($binaryPath, 'x '));
         }
     }
 

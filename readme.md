@@ -1,6 +1,6 @@
 # Geckodriver support for Laravel Dusk
 
-This package will make [Laravel Dusk](https://github.com/laravel/dusk/) browser tests run in Firefox. Instead of using Chromedriver, Laravel application tests are sent to Firefox's [Geckodriver](https://github.com/mozilla/geckodriver) proxy server.
+This package will make [Laravel Dusk](https://github.com/laravel/dusk/) browser tests run in Mozilla Firefox. Instead of using Chromedriver, Laravel application tests are sent to Firefox's [Geckodriver](https://github.com/mozilla/geckodriver) proxy server.
 
 * [Features](#features)
 * [Requirements](#requirements)
