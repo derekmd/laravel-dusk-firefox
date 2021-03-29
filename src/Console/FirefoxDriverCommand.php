@@ -35,7 +35,14 @@ class FirefoxDriverCommand extends Command
     protected $description = 'Install the Geckodriver binary';
 
     /**
-     * URL to the latest release version.
+     * Hardcode a recent version in case $latestVersionUrl can't be reached.
+     *
+     * @var string
+     */
+    protected $latestVersion = 'v0.29.0';
+
+    /**
+     * URL to discover latest release version.
      *
      * @var string
      */
@@ -148,7 +155,20 @@ class FirefoxDriverCommand extends Command
      */
     protected function latestVersion()
     {
-        $body = $this->downloadUrl($this->latestVersionUrl)->getBody();
+        try {
+            $body = $this->downloadUrl($this->latestVersionUrl)->getBody();
+        } catch (DownloadException $e) {
+            if (! $e->isRateLimited()) {
+                throw $e;
+            }
+
+            $this->info(vsprintf('%s is rate limited from this IP address. Assuming %s.', [
+                $this->latestVersionUrl,
+                $this->latestVersion,
+            ]));
+
+            return $this->latestVersion;
+        }
 
         $version = json_decode($body, true)['tag_name'] ?? null;
 
