@@ -7,13 +7,11 @@ use Illuminate\Support\ServiceProvider;
 class DuskServiceProvider extends ServiceProvider
 {
     /**
-     * Register any package services.
+     * Bootstrap any package services.
      *
      * @return void
-     *
-     * @throws \Exception
      */
-    public function register()
+    public function boot()
     {
         if ($this->app->runningInConsole()) {
             $this->commands([
