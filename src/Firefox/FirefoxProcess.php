@@ -2,7 +2,7 @@
 
 namespace Derekmd\Dusk\Firefox;
 
-use Laravel\Dusk\OperatingSystem;
+use Derekmd\Dusk\OperatingSystem;
 use RuntimeException;
 use Symfony\Component\Process\Process;
 
@@ -38,12 +38,13 @@ class FirefoxProcess
     {
         if ($this->driver) {
             $driver = $this->driver;
-        } elseif ($this->onWindows()) {
-            $driver = __DIR__.'/../../bin/geckodriver-win.exe';
-        } elseif ($this->onMac()) {
-            $driver = __DIR__.'/../../bin/geckodriver-mac';
         } else {
-            $driver = __DIR__.'/../../bin/geckodriver-linux';
+            $driver = __DIR__.'/../../bin/'.[
+                'linux' => 'geckodriver-linux',
+                'mac' => 'geckodriver-mac',
+                'mac-arm' => 'geckodriver-mac-arm',
+                'win' => 'geckodriver-win.exe',
+            ][$this->operatingSystemId()];
         }
 
         $this->driver = realpath($driver);
@@ -103,5 +104,15 @@ class FirefoxProcess
     protected function onMac()
     {
         return OperatingSystem::onMac();
+    }
+
+    /**
+     * Determine OS ID.
+     *
+     * @return string
+     */
+    protected function operatingSystemId()
+    {
+        return OperatingSystem::geckodriverId();
     }
 }

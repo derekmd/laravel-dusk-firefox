@@ -51,6 +51,10 @@ class FirefoxDriverCommandTest extends TestCase
             case 'Windows':
                 return 'geckodriver-'.static::VERSION.'-win64.zip';
             case 'Darwin':
+                if (php_uname('m') === 'arm64') {
+                    return 'geckodriver-'.static::VERSION.'-macos-aarch64.tar.gz';
+                }
+
                 return 'geckodriver-'.static::VERSION.'-macos.tar.gz';
             default:
                 return 'geckodriver-'.static::VERSION.'-linux64.tar.gz';
@@ -63,6 +67,10 @@ class FirefoxDriverCommandTest extends TestCase
             case 'Windows':
                 return 'geckodriver-win.exe';
             case 'Darwin':
+                if (php_uname('m') === 'arm64') {
+                    return 'geckodriver-mac-arm';
+                }
+
                 return 'geckodriver-mac';
             default:
                 return 'geckodriver-linux';
@@ -75,6 +83,10 @@ class FirefoxDriverCommandTest extends TestCase
             case 'Windows':
                 return 'win';
             case 'Darwin':
+                if (php_uname('m') === 'arm64') {
+                    return 'mac-arm';
+                }
+
                 return 'mac';
             default:
                 return 'linux';
@@ -187,6 +199,17 @@ class FirefoxDriverCommandTest extends TestCase
 
         $http->shouldReceive('request')->with(
             'GET',
+            vsprintf('https://github.com/mozilla/geckodriver/releases/download/%s/geckodriver-%s-macos-aarch64.tar.gz', [
+                static::VERSION,
+                static::VERSION,
+            ]),
+            ['sink' => $this->tempDir.'/geckodriver-'.static::VERSION.'-macos-aarch64.tar.gz']
+        )->andReturnUsing(function () {
+            return $this->copyMockBinary('geckodriver-'.static::VERSION.'-macos-aarch64.tar.gz');
+        });
+
+        $http->shouldReceive('request')->with(
+            'GET',
             vsprintf('https://github.com/mozilla/geckodriver/releases/download/%s/geckodriver-%s-linux64.tar.gz', [
                 static::VERSION,
                 static::VERSION,
@@ -208,6 +231,9 @@ class FirefoxDriverCommandTest extends TestCase
 
         $this->assertFileDoesNotExist($this->tempDir.'/geckodriver-'.static::VERSION.'-macos.tar.gz');
         $this->assertStringEqualsFile($this->tempDir.'/geckodriver-mac', 'foo');
+
+        $this->assertFileDoesNotExist($this->tempDir.'/geckodriver-'.static::VERSION.'-macos-aarch64.tar.gz');
+        $this->assertStringEqualsFile($this->tempDir.'/geckodriver-mac-arm', 'foo');
 
         $this->assertFileDoesNotExist($this->tempDir.'/geckodriver-'.static::VERSION.'-linux64.tar.gz');
         $this->assertStringEqualsFile($this->tempDir.'/geckodriver-linux', 'foo');
