@@ -35,6 +35,14 @@ class FirefoxProcessTest extends TestCase
         $this->assertStringContainsString('geckodriver-mac', $process->getCommandLine());
     }
 
+    public function test_build_process_for_mac_arm_m1()
+    {
+        $process = (new FirefoxProcessM1)->toProcess();
+
+        $this->assertInstanceOf(Process::class, $process);
+        $this->assertStringContainsString('geckodriver-mac-arm', $process->getCommandLine());
+    }
+
     public function test_build_process_for_linux()
     {
         $process = (new FirefoxProcessLinux)->toProcess();
@@ -61,6 +69,11 @@ class FirefoxProcessWindows extends FirefoxProcess
     {
         return true;
     }
+
+    protected function operatingSystemId()
+    {
+        return 'win';
+    }
 }
 
 class FirefoxProcessDarwin extends FirefoxProcess
@@ -74,6 +87,29 @@ class FirefoxProcessDarwin extends FirefoxProcess
     {
         return false;
     }
+
+    protected function operatingSystemId()
+    {
+        return 'mac';
+    }
+}
+
+class FirefoxProcessM1 extends FirefoxProcess
+{
+    protected function onMac()
+    {
+        return true;
+    }
+
+    protected function onWindows()
+    {
+        return false;
+    }
+
+    protected function operatingSystemId()
+    {
+        return 'mac-arm';
+    }
 }
 
 class FirefoxProcessLinux extends FirefoxProcess
@@ -86,5 +122,10 @@ class FirefoxProcessLinux extends FirefoxProcess
     protected function onWindows()
     {
         return false;
+    }
+
+    protected function operatingSystemId()
+    {
+        return 'linux';
     }
 }

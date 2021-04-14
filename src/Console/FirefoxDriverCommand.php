@@ -39,7 +39,7 @@ class FirefoxDriverCommand extends Command
      *
      * @var string
      */
-    protected $latestVersion = 'v0.29.0';
+    protected $latestVersion = 'v0.29.1';
 
     /**
      * URL to discover latest release version.
@@ -130,9 +130,10 @@ class FirefoxDriverCommand extends Command
         return collect([
             'linux' => 'linux64.tar.gz',
             'mac' => 'macos.tar.gz',
+            'mac-arm' => 'macos-aarch64.tar.gz',
             'win' => 'win64.zip',
         ])->unless($this->option('all'), function ($items) {
-            return $items->only(OperatingSystem::parentId());
+            return $items->only(OperatingSystem::geckodriverId());
         })->all();
     }
 
