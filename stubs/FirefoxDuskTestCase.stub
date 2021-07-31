@@ -4,7 +4,7 @@ namespace Tests;
 
 use Derekmd\Dusk\Concerns\TogglesHeadlessMode;
 use Derekmd\Dusk\Firefox\SupportsFirefox;
-use Facebook\WebDriver\Firefox\FirefoxDriver;
+use Facebook\WebDriver\Firefox\FirefoxOptions;
 use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Laravel\Dusk\TestCase as BaseTestCase;
@@ -35,17 +35,13 @@ abstract class DuskTestCase extends BaseTestCase
      */
     protected function driver()
     {
-        $options = [
-            'args' => $this->filterHeadlessArguments([
+        $capabilities = DesiredCapabilities::firefox();
+
+        $capabilities->getCapability(FirefoxOptions::CAPABILITY)
+            ->addArguments($this->filterHeadlessArguments([
                 '--headless',
                 '--window-size=1920,1080',
-            ]),
-        ];
-
-        $capabilities = DesiredCapabilities::firefox()
-            ->setCapability('moz:firefoxOptions', $options);
-
-        $capabilities->getCapability(FirefoxDriver::PROFILE)
+            ]))
             ->setPreference('devtools.console.stdout.content', true);
 
         return RemoteWebDriver::create(
