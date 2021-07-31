@@ -11,7 +11,7 @@
     "license": "MIT",
     "support": {
         "issues": "https://github.com/derekmd/laravel-dusk-firefox/issues",
-        "source": "https://github.com/spatie/laravel-query-builder"
+        "source": "https://github.com/derekmd/laravel-dusk-firefox"
     },
     "authors": [
         {
@@ -22,7 +22,8 @@
     "require": {
         "php": "^7.2|^8.0",
         "guzzlehttp/guzzle": "^6.0|^7.0",
-        "laravel/dusk": "^6.0"
+        "laravel/dusk": "^6.0",
+        "php-webdriver/webdriver": "^1.11.0"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.0",
