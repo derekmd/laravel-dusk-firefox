@@ -35,9 +35,12 @@ class StdoutLog
             preg_split('/[\r\n]+/', $this->process->getOutput())
         )->reject(function ($line) {
             return Str::contains($line, [
-                "INFO\tListening on port",
+                "INFO\tListening on ",
                 "INFO\tRunning command",
                 "WARN\tLoading extension",
+                "INFO\tMarionette enabled",
+                'No settings file exists, new profile?',
+                'failed mapping default framebuffer',
             ]);
         })->implode("\n");
     }
