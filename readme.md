@@ -33,7 +33,7 @@ This package will make [Laravel Dusk](https://github.com/laravel/dusk/) browser 
 * PHP 7.2+
 * Laravel Framework 6.0+
 * Laravel Dusk 6.0+
-* Mozilla Firefox browser installed locally
+* Latest version of Mozilla Firefox installed locally
 
 <a name="installation"></a>
 ## Installation
