@@ -187,7 +187,7 @@ services:
 
 **You may not require this package** if you exclusively use Laravel Sail for development.
 
-Over 90% of this package's solution is focused on managing a local Geckodriver process through PHPUnit's event hooks. Laravel Sail replaces Chromedriver/Geckodriver with a Selenium server so the only custom code you'll require in your application is a WebDriver configuration for Firefox. [Copy this driver() method](https://github.com/derekmd/laravel-dusk-firefox/blob/58d10303c580b120d0f70cb4a202d188c89a192b/stubs/FirefoxDuskTestCase.stub#L37-L52) into your application's `tests/DuskTestCase.php` file. Then use the above `docker-compose.yml` instructions to install Docker image "selenium/standalone-firefox".
+Over 90% of this package's solution is focused on managing a local Geckodriver process through PHPUnit's event hooks. Laravel Sail replaces Chromedriver/Geckodriver with a Selenium server so the only custom code you'll require in your application is a WebDriver configuration for Firefox. [Copy this driver() method](https://github.com/derekmd/laravel-dusk-firefox/blob/ba33ab3dabcdcbe322325a0e2138c5d13c417e6a/stubs/FirefoxDuskTestCase.stub#L38-L50) into your application's `tests/DuskTestCase.php` file. Then use the above `docker-compose.yml` instructions to install Docker image "selenium/standalone-firefox".
 
 ### Mixing other development environments with Laravel Sail
 
@@ -255,7 +255,7 @@ or call PHPUnit directly:
    * If another service is using port 4444, open `tests/DuskTestCase.php` and change the `driver()` method to configure another port number.
 2. My test suite that passed 100% using Chromedriver now fails in Firefox. How do I fix my tests?
    
-   You may find Firefox is more temperamental when calling Laravel Dusk method `visit()` or navigating between web pages. For HTTP redirects and form submissions, you may wish to avoid first calling methods `assertPathIs()` `assertPortIsNot()` or `assertPathBeginsWith()`. [Waiting for elements](https://laravel.com/docs/7.x/dusk#waiting-for-elements) methods such as the `waitForText()` method are the best fit to delay the test until the next web page has finished loading. When all else fails, add trial-and-error `pause(milliseconds)` calls to make the test determinstic in all environments.
+   You may find Firefox is more temperamental when calling Laravel Dusk method `visit()` or navigating between web pages. For HTTP redirects and form submissions, you may wish to avoid first calling methods `assertPathIs()` `assertPortIsNot()` or `assertPathBeginsWith()`. [Waiting for elements](https://laravel.com/docs/dusk#waiting-for-elements) methods such as the `waitForText()` method are the best fit to delay the test until the next web page has finished loading. When all else fails, add trial-and-error `pause(milliseconds)` calls to make the test determinstic in all environments.
 3. Can you help me get my tests running in Firefox?
    
    Sorry, no. That would be outside of the scope of support for this package. You can try [Laravel community support channels](https://laravel.com/docs/master/contributions#support-questions) such as the https://laracasts.com/ and https://laravel.io/ forums.
