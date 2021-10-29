@@ -39,7 +39,7 @@ class FirefoxDriverCommand extends Command
      *
      * @var string
      */
-    protected $latestVersion = 'v0.29.1';
+    protected $latestVersion = 'v0.30.0';
 
     /**
      * URL to discover latest release version.
