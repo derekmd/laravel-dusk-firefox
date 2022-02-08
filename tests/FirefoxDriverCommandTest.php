@@ -9,8 +9,6 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
-use League\Flysystem\Adapter\Local;
-use League\Flysystem\Filesystem;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
 use Psr\Http\Message\ResponseInterface;
@@ -19,7 +17,6 @@ class FirefoxDriverCommandTest extends TestCase
 {
     protected $archiveFilename;
     protected $binaryFilename;
-    private $filesystem;
     private $tempDir;
 
     protected const VERSION = 'v0.29.0';
@@ -28,19 +25,15 @@ class FirefoxDriverCommandTest extends TestCase
     {
         $this->archiveFilename = $this->archiveFilename();
         $this->binaryFilename = $this->binaryFilename();
-        $this->tempDir = __DIR__.'/tmp';
-        $this->filesystem = new Filesystem(new Local($this->tempDir));
+        $this->tempDir = new Support\TempDirectory(__DIR__.'/tmp');
     }
 
     protected function tearDown(): void
     {
-        $filesystem = new Filesystem(new Local(dirname($this->tempDir)));
-        $filesystem->deleteDir(basename($this->tempDir));
-
+        $this->tempDir->delete();
+        $this->tempDir = null;
         $this->archiveFilename = null;
         $this->binaryFilename = null;
-        $this->tempDir = null;
-        $this->filesystem = null;
 
         parent::tearDown();
     }
@@ -114,17 +107,17 @@ class FirefoxDriverCommandTest extends TestCase
                 static::VERSION,
                 $this->archiveFilename,
             ]),
-            ['sink' => $this->tempDir.'/'.$this->archiveFilename]
+            ['sink' => $this->tempDir->path($this->archiveFilename)]
         )->andReturnUsing(function () {
             return $this->copyMockBinary($this->archiveFilename);
         });
 
-        $this->artisan('dusk:firefox-driver', ['--output' => $this->tempDir])
+        $this->artisan('dusk:firefox-driver', ['--output' => $this->tempDir->path()])
             ->expectsOutput('Geckodriver binary successfully installed for version '.static::VERSION.'.')
             ->assertExitCode(0);
 
-        $this->assertFileDoesNotExist($this->tempDir.'/'.$this->archiveFilename);
-        $this->assertStringEqualsFile($this->tempDir.'/'.$this->binaryFilename, 'foo');
+        $this->assertFileDoesNotExist($this->tempDir->path($this->archiveFilename));
+        $this->assertStringEqualsFile($this->tempDir->path($this->binaryFilename), 'foo');
     }
 
     public function test_it_can_download_through_proxy_without_ssl()
@@ -147,7 +140,7 @@ class FirefoxDriverCommandTest extends TestCase
                 $this->archiveFilename,
             ]),
             [
-                'sink' => $this->tempDir.'/'.$this->archiveFilename,
+                'sink' => $this->tempDir->path($this->archiveFilename),
                 'proxy' => 'tcp://127.0.0.1:9000',
                 'verify' => false,
             ]
@@ -156,15 +149,15 @@ class FirefoxDriverCommandTest extends TestCase
         });
 
         $this->artisan('dusk:firefox-driver', [
-            '--output' => $this->tempDir,
+            '--output' => $this->tempDir->path(),
             '--proxy' => 'tcp://127.0.0.1:9000',
             '--ssl-no-verify' => true,
         ])
             ->expectsOutput('Geckodriver binary successfully installed for version '.static::VERSION.'.')
             ->assertExitCode(0);
 
-        $this->assertFileDoesNotExist($this->tempDir.'/'.$this->archiveFilename);
-        $this->assertStringEqualsFile($this->tempDir.'/'.$this->binaryFilename, 'foo');
+        $this->assertFileDoesNotExist($this->tempDir->path($this->archiveFilename));
+        $this->assertStringEqualsFile($this->tempDir->path($this->binaryFilename), 'foo');
     }
 
     public function test_it_can_download_geckodriver_for_linux_mac_and_windows()
@@ -181,7 +174,7 @@ class FirefoxDriverCommandTest extends TestCase
                 static::VERSION,
                 static::VERSION,
             ]),
-            ['sink' => $this->tempDir.'/geckodriver-'.static::VERSION.'-win64.zip']
+            ['sink' => $this->tempDir->path('geckodriver-'.static::VERSION.'-win64.zip')]
         )->andReturnUsing(function () {
             return $this->copyMockBinary('geckodriver-'.static::VERSION.'-win64.zip');
         });
@@ -192,7 +185,7 @@ class FirefoxDriverCommandTest extends TestCase
                 static::VERSION,
                 static::VERSION,
             ]),
-            ['sink' => $this->tempDir.'/geckodriver-'.static::VERSION.'-macos.tar.gz']
+            ['sink' => $this->tempDir->path('geckodriver-'.static::VERSION.'-macos.tar.gz')]
         )->andReturnUsing(function () {
             return $this->copyMockBinary('geckodriver-'.static::VERSION.'-macos.tar.gz');
         });
@@ -203,7 +196,7 @@ class FirefoxDriverCommandTest extends TestCase
                 static::VERSION,
                 static::VERSION,
             ]),
-            ['sink' => $this->tempDir.'/geckodriver-'.static::VERSION.'-macos-aarch64.tar.gz']
+            ['sink' => $this->tempDir->path('geckodriver-'.static::VERSION.'-macos-aarch64.tar.gz')]
         )->andReturnUsing(function () {
             return $this->copyMockBinary('geckodriver-'.static::VERSION.'-macos-aarch64.tar.gz');
         });
@@ -214,29 +207,29 @@ class FirefoxDriverCommandTest extends TestCase
                 static::VERSION,
                 static::VERSION,
             ]),
-            ['sink' => $this->tempDir.'/geckodriver-'.static::VERSION.'-linux64.tar.gz']
+            ['sink' => $this->tempDir->path('geckodriver-'.static::VERSION.'-linux64.tar.gz')]
         )->andReturnUsing(function () {
             return $this->copyMockBinary('geckodriver-'.static::VERSION.'-linux64.tar.gz');
         });
 
         $this->artisan('dusk:firefox-driver', [
             '--all' => true,
-            '--output' => $this->tempDir,
+            '--output' => $this->tempDir->path(),
         ])
             ->expectsOutput('Geckodriver binaries successfully installed for version '.static::VERSION.'.')
             ->assertExitCode(0);
 
-        $this->assertFileDoesNotExist($this->tempDir.'/geckodriver-'.static::VERSION.'-win64.zip');
-        $this->assertStringEqualsFile($this->tempDir.'/geckodriver-win.exe', 'foo');
+        $this->assertFileDoesNotExist($this->tempDir->path('geckodriver-'.static::VERSION.'-win64.zip'));
+        $this->assertStringEqualsFile($this->tempDir->path('geckodriver-win.exe'), 'foo');
 
-        $this->assertFileDoesNotExist($this->tempDir.'/geckodriver-'.static::VERSION.'-macos.tar.gz');
-        $this->assertStringEqualsFile($this->tempDir.'/geckodriver-mac', 'foo');
+        $this->assertFileDoesNotExist($this->tempDir->path('geckodriver-'.static::VERSION.'-macos.tar.gz'));
+        $this->assertStringEqualsFile($this->tempDir->path('geckodriver-mac'), 'foo');
 
-        $this->assertFileDoesNotExist($this->tempDir.'/geckodriver-'.static::VERSION.'-macos-aarch64.tar.gz');
-        $this->assertStringEqualsFile($this->tempDir.'/geckodriver-mac-arm', 'foo');
+        $this->assertFileDoesNotExist($this->tempDir->path('geckodriver-'.static::VERSION.'-macos-aarch64.tar.gz'));
+        $this->assertStringEqualsFile($this->tempDir->path('geckodriver-mac-arm'), 'foo');
 
-        $this->assertFileDoesNotExist($this->tempDir.'/geckodriver-'.static::VERSION.'-linux64.tar.gz');
-        $this->assertStringEqualsFile($this->tempDir.'/geckodriver-linux', 'foo');
+        $this->assertFileDoesNotExist($this->tempDir->path('geckodriver-'.static::VERSION.'-linux64.tar.gz'));
+        $this->assertStringEqualsFile($this->tempDir->path('geckodriver-linux'), 'foo');
     }
 
     public function test_it_will_handle_network_connection_lost()
@@ -259,12 +252,12 @@ class FirefoxDriverCommandTest extends TestCase
             $this->archiveFilename,
         ]).': curl (7): Failed to connect to api.github.com port 80: Connection refused';
 
-        $this->artisan('dusk:firefox-driver', ['--output' => $this->tempDir])
+        $this->artisan('dusk:firefox-driver', ['--output' => $this->tempDir->path()])
             ->expectsOutput($expectedError)
             ->assertExitCode(1);
 
-        $this->assertFileDoesNotExist($this->tempDir.'/'.$this->archiveFilename);
-        $this->assertFileDoesNotExist($this->tempDir.'/'.$this->binaryFilename, 'foo');
+        $this->assertFileDoesNotExist($this->tempDir->path($this->archiveFilename));
+        $this->assertFileDoesNotExist($this->tempDir->path($this->binaryFilename), 'foo');
     }
 
     public function test_it_can_handle_empty_archive_missing_geckodriver_binary_file()
@@ -287,17 +280,17 @@ class FirefoxDriverCommandTest extends TestCase
         $http->shouldReceive('request')->with(
             'GET',
             "https://github.com/mozilla/geckodriver/releases/download/missing-binary/$downloadedFilename",
-            ['sink' => $this->tempDir.'/'.$downloadedFilename]
+            ['sink' => $this->tempDir->path($downloadedFilename)]
         )->andReturnUsing(function () use ($downloadedFilename) {
             return $this->copyMockBinary($downloadedFilename);
         });
 
-        $this->artisan('dusk:firefox-driver', ['--output' => $this->tempDir])
+        $this->artisan('dusk:firefox-driver', ['--output' => $this->tempDir->path()])
             ->expectsOutput('Geckodriver binary installation failed for '.$this->os().'.')
             ->assertExitCode(1);
 
-        $this->assertFileDoesNotExist($this->tempDir.'/'.$this->archiveFilename);
-        $this->assertFileDoesNotExist($this->tempDir.'/'.$this->binaryFilename);
+        $this->assertFileDoesNotExist($this->tempDir->path($this->archiveFilename));
+        $this->assertFileDoesNotExist($this->tempDir->path($this->binaryFilename));
     }
 
     protected function mockDownloadResponse($path, $callback = null)
@@ -317,7 +310,7 @@ class FirefoxDriverCommandTest extends TestCase
 
     protected function copyMockBinary($filename)
     {
-        copy(__DIR__.'/fixtures/'.$filename, $this->tempDir.'/'.$filename);
+        copy(__DIR__.'/fixtures/'.$filename, $this->tempDir->path($filename));
 
         return $this->mockDownloadResponse(__DIR__.'/fixtures/'.$filename);
     }

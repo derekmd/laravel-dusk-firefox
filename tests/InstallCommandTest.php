@@ -7,21 +7,17 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
-use League\Flysystem\Adapter\Local;
-use League\Flysystem\Filesystem;
 use Orchestra\Testbench\TestCase;
 
 class InstallCommandTest extends TestCase
 {
-    private $filesystem;
     private $tempDir;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->tempDir = __DIR__.'/tmp';
-        $this->filesystem = new Filesystem(new Local($this->tempDir));
+        $this->tempDir = new Support\TempDirectory(__DIR__.'/tmp');
 
         // Don't fully run child command 'dusk:firefox-driver'.
         // This makes the command fail early, leaving downloaded binaries alone.
@@ -34,8 +30,8 @@ class InstallCommandTest extends TestCase
 
     protected function tearDown(): void
     {
-        $filesystem = new Filesystem(new Local(dirname($this->tempDir)));
-        $filesystem->deleteDir(basename($this->tempDir));
+        $this->tempDir->delete();
+        $this->tempDir = null;
 
         parent::tearDown();
     }
@@ -49,50 +45,50 @@ class InstallCommandTest extends TestCase
 
     public function test_it_can_copy_test_stub()
     {
-        $this->artisan('dusk:install-firefox', ['--output' => $this->tempDir])
+        $this->artisan('dusk:install-firefox', ['--output' => $this->tempDir->path()])
             ->expectsOutput('Firefox scaffolding installed successfully.')
             ->expectsOutput('Downloading Geckodriver binaries...')
             ->assertExitCode(0);
 
-        $this->assertFileExists($this->tempDir.'/DuskTestCase.php');
-        $this->assertStringContainsString('static::startFirefoxDriver();', file_get_contents($this->tempDir.'/DuskTestCase.php'));
+        $this->assertFileExists($this->tempDir->path('DuskTestCase.php'));
+        $this->assertStringContainsString('static::startFirefoxDriver();', file_get_contents($this->tempDir->path('DuskTestCase.php')));
     }
 
     public function test_it_can_overwrite_existing_test_class_when_confirmed()
     {
-        file_put_contents($this->tempDir.'/DuskTestCase.php', 'foo');
+        file_put_contents($this->tempDir->path('DuskTestCase.php'), 'foo');
 
         $this->artisan('dusk:install-firefox', [
-            '--output' => $this->tempDir,
+            '--output' => $this->tempDir->path(),
             '--with-chrome' => true,
         ])
-            ->expectsConfirmation('Overwrite file '.$this->tempDir.'/DuskTestCase.php?', 'yes')
+            ->expectsConfirmation('Overwrite file '.$this->tempDir->path('DuskTestCase.php?'), 'yes')
             ->expectsOutput('Firefox scaffolding installed successfully.')
             ->expectsOutput('Downloading Geckodriver binaries...')
             ->assertExitCode(0);
 
-        $this->assertFileExists($this->tempDir.'/DuskTestCase.php');
-        $this->assertStringContainsString('static::startChromeDriver();', file_get_contents($this->tempDir.'/DuskTestCase.php'));
+        $this->assertFileExists($this->tempDir->path('DuskTestCase.php'));
+        $this->assertStringContainsString('static::startChromeDriver();', file_get_contents($this->tempDir->path('DuskTestCase.php')));
     }
 
     public function test_it_will_not_overwrite_test_class_when_declined()
     {
-        file_put_contents($this->tempDir.'/DuskTestCase.php', 'foo');
+        file_put_contents($this->tempDir->path('DuskTestCase.php'), 'foo');
 
-        $this->artisan('dusk:install-firefox', ['--output' => $this->tempDir])
-            ->expectsConfirmation('Overwrite file '.$this->tempDir.'/DuskTestCase.php?', 'no')
+        $this->artisan('dusk:install-firefox', ['--output' => $this->tempDir->path()])
+            ->expectsConfirmation('Overwrite file '.$this->tempDir->path('DuskTestCase.php?'), 'no')
             ->expectsOutput('Firefox scaffolding not installed.')
             ->assertExitCode(0);
 
-        $this->assertStringEqualsFile($this->tempDir.'/DuskTestCase.php', 'foo');
+        $this->assertStringEqualsFile($this->tempDir->path('DuskTestCase.php'), 'foo');
     }
 
     public function test_it_can_overwrite_test_class_unprompted()
     {
-        file_put_contents($this->tempDir.'/DuskTestCase.php', 'foo');
+        file_put_contents($this->tempDir->path('DuskTestCase.php'), 'foo');
 
         $this->artisan('dusk:install-firefox', [
-            '--output' => $this->tempDir,
+            '--output' => $this->tempDir->path(),
             '--with-chrome' => true,
             '--force' => true,
         ])
@@ -100,7 +96,7 @@ class InstallCommandTest extends TestCase
             ->expectsOutput('Downloading Geckodriver binaries...')
             ->assertExitCode(0);
 
-        $this->assertFileExists($this->tempDir.'/DuskTestCase.php');
-        $this->assertStringContainsString('static::startChromeDriver();', file_get_contents($this->tempDir.'/DuskTestCase.php'));
+        $this->assertFileExists($this->tempDir->path('DuskTestCase.php'));
+        $this->assertStringContainsString('static::startChromeDriver();', file_get_contents($this->tempDir->path('DuskTestCase.php')));
     }
 }
