@@ -28,7 +28,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        composer require "phpunit/phpunit:^9.5" --dev --no-update
+        composer require "phpunit/phpunit:^9.5.10" --dev --no-update
         composer update --prefer-dist --no-interaction --no-progress --ansi
 
     - name: Install Geckodriver
@@ -59,7 +59,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        composer require "phpunit/phpunit:^9.5" --dev --no-update
+        composer require "phpunit/phpunit:^9.5.10" --dev --no-update
         composer update --prefer-dist --no-interaction --no-progress --ansi
 
     - name: Install Geckodriver
@@ -90,7 +90,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        composer require "phpunit/phpunit:^9.5" --dev --no-update
+        composer require "phpunit/phpunit:^9.5.10" --dev --no-update
         composer update --prefer-dist --no-interaction --no-progress --ansi
 
     - name: Install Geckodriver
