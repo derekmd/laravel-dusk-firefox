@@ -22,7 +22,7 @@
     "require": {
         "php": "^7.2|^8.0",
         "guzzlehttp/guzzle": "^6.0|^7.0",
-        "laravel/dusk": "^6.0",
+        "laravel/dusk": "^6.0|^7.0",
         "php-webdriver/webdriver": "^1.11.0"
     },
     "require-dev": {
