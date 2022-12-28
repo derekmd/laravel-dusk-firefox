@@ -14,7 +14,9 @@ class ChromeCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'dusk:chrome {--without-tty : Disable output to TTY}';
+    protected $signature = 'dusk:chrome
+        {--skip-install-check : Don\'t check DuskTestCase.php references ChromeDriver.}
+        {--without-tty : Disable output to TTY}';
 
     /**
      * The console command description.
@@ -49,12 +51,14 @@ class ChromeCommand extends Command
      */
     public function handle()
     {
-        if (! $this->hasChromedriverSetup()) {
+        if (! $this->option('skip-install-check') && ! $this->hasChromedriverSetup()) {
             $this->info('It looks like you must configure your application for Chromedriver.');
             $this->info('Run "php artisan dusk:install-firefox --with-chrome" to install new scaffolding.');
 
             return 1;
         }
+
+        $this->cleanArgv();
 
         $duskFile = new DuskFile($this->laravel->environment());
 
@@ -80,7 +84,7 @@ class ChromeCommand extends Command
      */
     protected function hasChromedriverSetup()
     {
-        return Str::contains($this->duskTestCaseContents(), 'startChromeDriver()');
+        return Str::contains($this->duskTestCaseContents(), 'startChromeDriver');
     }
 
     /**
@@ -91,5 +95,17 @@ class ChromeCommand extends Command
     protected function duskTestCaseContents()
     {
         return file_get_contents(base_path('tests/DuskTestCase.php'));
+    }
+
+    /**
+     * Remove --skip-install-check to prevent Symfony method Command::run()
+     * applying invalid option: 'php artisan dusk --skip-install-check'.
+     *
+     * @return void
+     */
+    protected function cleanArgv()
+    {
+        $_SERVER['argv'] = array_diff($_SERVER['argv'], ['--skip-install-check']);
+        $_SERVER['argc'] = count($_SERVER['argv']);
     }
 }
