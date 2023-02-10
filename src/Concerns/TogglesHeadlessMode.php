@@ -30,4 +30,15 @@ trait TogglesHeadlessMode
         return isset($_SERVER['DUSK_HEADLESS_DISABLED']) ||
                isset($_ENV['DUSK_HEADLESS_DISABLED']);
     }
+
+    /**
+     * Determine if the browser window should start maximized.
+     *
+     * @return bool
+     */
+    protected function shouldStartMaximized()
+    {
+        return isset($_SERVER['DUSK_START_MAXIMIZED']) ||
+               isset($_ENV['DUSK_START_MAXIMIZED']);
+    }
 }

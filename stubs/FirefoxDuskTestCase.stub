@@ -21,11 +21,9 @@ abstract class DuskTestCase extends BaseTestCase
      */
     public static function prepare()
     {
-        if (static::runningFirefoxInSail()) {
-            return;
+        if (! static::runningFirefoxInSail()) {
+            static::startFirefoxDriver();
         }
-
-        static::startFirefoxDriver();
     }
 
     /**
