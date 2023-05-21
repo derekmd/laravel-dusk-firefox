@@ -9,6 +9,7 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\Psr7\Stream;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
 use Psr\Http\Message\ResponseInterface;
@@ -303,7 +304,12 @@ class FirefoxDriverCommandTest extends TestCase
 
         $response = m::mock(ResponseInterface::class);
         $response->shouldReceive('getBody')
-            ->andReturn($body);
+            ->andReturn(
+                m::mock(Stream::class, function ($mock) use ($body) {
+                    $mock->shouldReceive('__toString')
+                        ->andReturn($body);
+                })
+            );
 
         return $response;
     }
