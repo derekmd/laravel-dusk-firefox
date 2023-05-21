@@ -157,7 +157,7 @@ class FirefoxDriverCommand extends Command
     protected function latestVersion()
     {
         try {
-            $body = $this->downloadUrl($this->latestVersionUrl)->getBody();
+            $body = (string) $this->downloadUrl($this->latestVersionUrl)->getBody();
         } catch (DownloadException $e) {
             if (! $e->isRateLimited()) {
                 throw $e;
