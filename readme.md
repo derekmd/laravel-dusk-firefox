@@ -264,6 +264,19 @@ or call PHPUnit directly:
    Chromedriver implements Selenium's `commands.GetLog` endpoint which provides a wider range of testing feedback. Unfortunately this endpoint is not currently part of the [W3C WebDriver API](https://developer.mozilla.org/en-US/docs/Web/WebDriver) so Geckodriver does not support it.
    
    This limitation is the reason Mozilla Firefox support isn't built into the official Laravel Dusk package.
+5. Running `php artisan dusk:install-firefox` or `php artisan dusk:firefox-driver` returns:
+   > cURL error 60: SSL certificate problem: unable to get local issuer certificate (see https://curl.haxx.se/libcurl/c/libcurl-errors.html)
+
+   a. These two commands support option `--proxy` and `--ssl-no-verify` to control the cURL configuration when downloading Geckodriver binaries. `--ssl-no-verify` will skip checking the certificate, however:
+   b. To ensure SSL certificate verification passes for domain https://github.com, php.ini should be configured with PHP extension `openssl` enabled. If an OS-managed cert store cannot be found, file php.ini can be updated to configure a `.crt` file using https://curl.se/docs/caextract.html.
+      
+      ```
+      [openssl]
+      # Mac, Linux
+      openssl.cafile="~/ca-bundle.crt"
+      # Windows
+      # openssl.cafile="C:\xampp\apache\bin\curl-ca-bundle.crt"
+      ```
 
 <a name="contributing"></a>
 ## Contributing
