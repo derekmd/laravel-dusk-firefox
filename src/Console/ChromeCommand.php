@@ -4,7 +4,6 @@ namespace Derekmd\Dusk\Console;
 
 use Derekmd\Dusk\DuskFile;
 use Illuminate\Console\Command;
-use Illuminate\Support\Env;
 use Illuminate\Support\Str;
 
 class ChromeCommand extends Command
