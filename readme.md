@@ -263,11 +263,13 @@ or call PHPUnit directly:
    
    Chromedriver implements Selenium's `commands.GetLog` endpoint which provides a wider range of testing feedback. Unfortunately this endpoint is not currently part of the [W3C WebDriver API](https://developer.mozilla.org/en-US/docs/Web/WebDriver) so Geckodriver does not support it.
    
-   This limitation is the reason Mozilla Firefox support isn't built into the official Laravel Dusk package.
-5. Running `php artisan dusk:install-firefox` or `php artisan dusk:firefox-driver` returns:
+   This limitation is one of the reasons that Mozilla Firefox support isn't built into the official Laravel Dusk package.
+5. Why does running command `php artisan dusk:install-firefox` or `php artisan dusk:firefox-driver` return this error message?
    > cURL error 60: SSL certificate problem: unable to get local issuer certificate (see https://curl.haxx.se/libcurl/c/libcurl-errors.html)
-
-   a. These two commands support option `--proxy` and `--ssl-no-verify` to control the cURL configuration when downloading Geckodriver binaries. `--ssl-no-verify` will skip checking the certificate, however:
+   
+   The PHP environment may not be configured for handling SSL certificates.
+   
+   a. These two commands support options `--proxy` and `--ssl-no-verify` to control the cURL configuration when downloading Geckodriver binaries. `--ssl-no-verify` will skip checking the certificate, however:
    b. To ensure SSL certificate verification passes for domain https://github.com, php.ini should be configured with PHP extension `openssl` enabled. If an OS-managed cert store cannot be found, file php.ini can be updated to configure a `.crt` file using https://curl.se/docs/caextract.html.
       
       ```
@@ -277,6 +279,12 @@ or call PHPUnit directly:
       # Windows
       # openssl.cafile="C:\xampp\apache\bin\curl-ca-bundle.crt"
       ```
+6. Why is every test case failing with this error message?
+   ```
+   cUrl error (#28): Operation timed out after ... milliseconds with 0 bytes received`?
+   ```
+   
+   Xdebug may be awaiting a user interaction to continue from a code breakpoint. PHP extension Xdebug should be disabled in php.ini for running browser tests.
 
 <a name="contributing"></a>
 ## Contributing
