@@ -43,6 +43,7 @@
     },
     "scripts": {
         "download": "vendor/bin/phpunit tests/DownloadBinaries.php",
+        "lint": "./vendor/bin/php-cs-fixer fix -vvv --dry-run --show-progress=dots --diff",
         "test": "vendor/bin/phpunit"
     },
     "extra": {
