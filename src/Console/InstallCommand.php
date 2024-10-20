@@ -57,6 +57,15 @@ class InstallCommand extends Command
             return 1;
         }
 
+        // Laravel 11+ apps may not define a CreatesApplication trait.
+        if (! trait_exists(\Tests\CreatesApplication::class)) {
+            file_put_contents($stubDestination, str_replace(
+                'use CreatesApplication, ',
+                'use ',
+                file_get_contents($stubDestination),
+            ));
+        }
+
         $this->info('Firefox scaffolding installed successfully.');
 
         $this->comment('Downloading Geckodriver binaries...');
