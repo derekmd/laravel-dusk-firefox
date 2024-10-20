@@ -7,11 +7,13 @@ use Derekmd\Dusk\Exceptions\DownloadException;
 use Derekmd\Dusk\OperatingSystem;
 use Illuminate\Console\Command;
 use RuntimeException;
+use Symfony\Component\Console\Attribute\AsCommand;
 
 /**
  * @copyright Proxy downloads are based on https://github.com/staudenmeir/dusk-updater
  *            by Jonas Staudenmeir.
  */
+#[AsCommand(name: 'dusk:firefox-driver')]
 class FirefoxDriverCommand extends Command
 {
     use DownloadsBinaries;

@@ -5,7 +5,9 @@ namespace Derekmd\Dusk\Console;
 use Derekmd\Dusk\DuskFile;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'dusk:chrome')]
 class ChromeCommand extends Command
 {
     /**

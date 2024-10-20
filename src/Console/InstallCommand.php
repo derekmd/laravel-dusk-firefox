@@ -3,7 +3,9 @@
 namespace Derekmd\Dusk\Console;
 
 use Illuminate\Console\Command;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'dusk:install-firefox')]
 class InstallCommand extends Command
 {
     /**
