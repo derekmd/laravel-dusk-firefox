@@ -30,9 +30,10 @@ This package will make [Laravel Dusk](https://github.com/laravel/dusk/) browser 
 <a name="requirements"></a>
 ## Requirements
 
-* PHP 7.2+
-* Laravel Framework 6.0+
-* Laravel Dusk 6.0+
+* PHP 8.1+
+* Laravel Framework 10.0+
+* Laravel Dusk 8.0+
+* PHPUnit 10+
 * Latest version of Mozilla Firefox installed locally
 
 <a name="installation"></a>
@@ -285,6 +286,28 @@ or call PHPUnit directly:
    ```
    
    Xdebug may be awaiting a user interaction to continue from a code breakpoint. PHP extension Xdebug should be disabled in php.ini for running browser tests.
+7. Why is every test case failing with this error message?
+   
+   > Expected browser binary location, but unable to find binary in default locatio
+n, no 'moz:firefoxOptions.binary' capability provided, and no binary flag set on
+ the command line
+   
+   Mozilla Firefox v130.0.1 introduced a bug on MS Windows that configured the binary path using the incorrect registry keys. See https://github.com/mozilla/geckodriver/issues/2199 for more details. If a similar error happens again in the future, try one of the below options.
+   
+   1. Reinstall the latest Mozilla Firefox.
+   2. Add the Mozilla Firefox executable directory to your operating system's environment variable `$PATH`.
+   3. Update tests/DuskTestCase.php method `driver()` to define the absolute binary path:
+      
+      ```php
+      $capabilities = DesiredCapabilities::firefox();
+      
+      $capabilities->getCapability(FirefoxOptions::CAPABILITY)
+          // ...
+          ->setOption('binary', 'c:\Program Files (x86)\Mozilla Firefox\firefox.exe');
+      ```
+8. Does this package support Pest as a Laravel Dusk test runner?
+   
+   No, currently this only supports PHPUnit. Contributors can submit a pull request for Pest support that will need to update DuskTestCase.php stub installation and the `SupportsFirefox` trait.
 
 <a name="contributing"></a>
 ## Contributing

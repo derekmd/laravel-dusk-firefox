@@ -3,7 +3,9 @@
 namespace Derekmd\Dusk\Console;
 
 use Illuminate\Console\Command;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'dusk:install-firefox')]
 class InstallCommand extends Command
 {
     /**
@@ -53,6 +55,15 @@ class InstallCommand extends Command
             $this->error("Unable to copy Firefox scaffolding to: $stubDestination");
 
             return 1;
+        }
+
+        // Laravel 11+ apps may not define a CreatesApplication trait.
+        if (! trait_exists(\Tests\CreatesApplication::class)) {
+            file_put_contents($stubDestination, str_replace(
+                'use CreatesApplication, ',
+                'use ',
+                file_get_contents($stubDestination),
+            ));
         }
 
         $this->info('Firefox scaffolding installed successfully.');

@@ -2,14 +2,12 @@
 
 namespace Derekmd\Dusk\Tests;
 
-use Derekmd\Dusk\Concerns\TogglesHeadlessMode;
+use Derekmd\Dusk\Tests\Stubs\TogglesHeadlessModeStub;
 use PHPUnit\Framework\TestCase;
 
 class TogglesHeadlessModeTest extends TestCase
 {
-    use TogglesHeadlessMode;
-
-    protected function tearDown() : void
+    protected function tearDown(): void
     {
         unset($_ENV['DUSK_HEADLESS_DISABLED']);
 
@@ -20,7 +18,7 @@ class TogglesHeadlessModeTest extends TestCase
     {
         unset($_ENV['DUSK_HEADLESS_DISABLED']);
 
-        $args = $this->filterHeadlessArguments([
+        $args = (new TogglesHeadlessModeStub)->filterHeadlessArguments([
             '--disable-gpu',
             '--headless',
             '--window-size=1920,1080',
@@ -37,7 +35,7 @@ class TogglesHeadlessModeTest extends TestCase
     {
         $_ENV['DUSK_HEADLESS_DISABLED'] = true;
 
-        $args = $this->filterHeadlessArguments([
+        $args = (new TogglesHeadlessModeStub)->filterHeadlessArguments([
             '--disable-gpu',
             '--headless',
             '--window-size=1920,1080',

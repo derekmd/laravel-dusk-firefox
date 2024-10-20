@@ -1,6 +1,18 @@
 name: Check PHP code style
 
-on: [push]
+on:
+  push:
+    branches:
+      - master
+      - 1.x
+      - 2.x
+    paths-ignore:
+      - LICENSE.md
+      - readme.md
+  pull_request:
+    paths-ignore:
+      - LICENSE.md
+      - readme.md
 
 jobs:
     style:
@@ -8,9 +20,17 @@ jobs:
 
         steps:
             -   name: Checkout code
-                uses: actions/checkout@v2
+                uses: actions/checkout@v4
+
+            -   name: .php-cs-fixer.cache
+                uses: actions/cache@v4
+                with:
+                    path: .php-cs-fixer.cache
+                    key: ${{ runner.OS }}-${{ github.repository }}-php-cs-fixer-${{ github.sha }}
+                    restore-keys: |
+                        ${{ runner.OS }}-${{ github.repository }}-php-cs-fixer-
 
             -   name: Check style
                 uses: docker://oskarstark/php-cs-fixer-ga
                 with:
-                    args: --config=.php-cs-fixer.php --dry-run --diff
+                    args: --dry-run --diff
