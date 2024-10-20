@@ -3,6 +3,7 @@
 namespace Derekmd\Dusk\Firefox;
 
 use Laravel\Dusk\Browser;
+use PHPUnit\Framework\Attributes\After;
 
 trait SupportsFirefox
 {
@@ -27,9 +28,7 @@ trait SupportsFirefox
      */
     protected static $firefoxLog;
 
-    /**
-     * @after
-     */
+    #[After]
     public function tearDownFirefoxConsoleOutput()
     {
         if (static::$firefoxLog) {
